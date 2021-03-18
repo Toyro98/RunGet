@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ConsoleApi
+namespace Api
 {
-    class Api
+    class RunInfo
     {
         public Data[] data { get; set; }
 
@@ -44,6 +44,46 @@ namespace ConsoleApi
             public string Rel { get; set; }
             public string Id { get; set; }
             public string Uri { get; set; }
+        }
+    }
+
+    class LeaderboardInfo
+    {
+        public Data[] data { get; set; }
+
+        public class Data
+        {
+            public int Place { get; set; }
+            public Run run { get; set; }
+        }
+
+        public class Run
+        {
+            public string Id { get; set; }
+            public string Game { get; set; }
+            public string Level { get; set; }
+            public string Category { get; set; }
+        }
+    }
+
+    class CategoryInfo
+    {
+        public Data data { get; set; }
+
+        public class Data
+        {
+            public Categories Categories { get; set; }
+        }
+
+        public class Categories
+        {
+            public Datum[] Data { get; set; }
+        }
+
+        public class Datum
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
         }
     }
 }
