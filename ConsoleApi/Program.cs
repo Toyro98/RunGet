@@ -10,24 +10,24 @@ namespace ConsoleApi
 {
     class Program
     {
-        private static string LatestRunID;
-        private static readonly string URL = "https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q";
+        static Api.RunInfo runs;
+        static Api.CategoryInfo category;
+        static Api.LeaderboardInfo leaderboard;
+
+        static string LatestRunID;
+        static readonly string URL_Runs = "https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q";
+        static readonly string URL_Category = "https://www.speedrun.com/api/v1/games/yo1yyr1q?embed=categories";
 
         static void Main(string[] args)
         {
             Console.Title = "RunGet v1.0";
 
-            // https://www.speedrun.com/api/v1/games/yo1yyr1q?embed=categories
-            // https://www.speedrun.com/api/v1/users/zxz9yqn8/personal-bests?game=yo1yyr1q
-
-            var client = new HttpClient();
-            var content = client.GetStringAsync(URL).Result;
-
             // Deserialize Json
-            Api.RunInfo api = JsonConvert.DeserializeObject<Api.RunInfo>(content);
+            runs = JsonConvert.DeserializeObject<Api.RunInfo>(new HttpClient().GetStringAsync(URL_Runs).Result);
+            category = JsonConvert.DeserializeObject<Api.CategoryInfo>(new HttpClient().GetStringAsync(URL_Category).Result);
 
             // Save the run ID
-            LatestRunID = api.data[0].Id.ToString();
+            LatestRunID = runs.data[0].Id.ToString();
 
             // Write the latest it found
             Console.WriteLine("[" + DateTime.Now + "] Latest ID found: " + LatestRunID);
@@ -43,18 +43,16 @@ namespace ConsoleApi
 
         static void LookForNewRuns()
         {
-            var client = new HttpClient();
-            var content = client.GetStringAsync(URL).Result;
-
-            Api.RunInfo apiRun = JsonConvert.DeserializeObject<Api.RunInfo>(content);
+            // Get runs from the API
+            runs = JsonConvert.DeserializeObject<Api.RunInfo>(new HttpClient().GetStringAsync(URL_Runs).Result);
 
             int num = 0;
 
-            // Loop through all 20 runs we get from the url
-            for (int i = 0; i < 20; i++)
+            // Loop through all runs we get from the url
+            for (int i = 0; i < runs.data.Length; i++)
             {
                 // Checks if the latest run is new and how many new runs there are
-                if ("yo9qq05y" == apiRun.data[i].Id.ToString() && num != 0)
+                if (LatestRunID == runs.data[i].Id.ToString() && num != 0)
                 {
                     Console.WriteLine("[" + DateTime.Now + $"] {num} new runs found");
                     break;
@@ -77,13 +75,13 @@ namespace ConsoleApi
                     // Save the run id 
                     if (num == 1)
                     {
-                        LatestRunID = apiRun.data[0].Id.ToString();
+                        LatestRunID = runs.data[0].Id.ToString();
                     }
 
-                    DiscordWebhook(apiRun, num);
+                    DiscordWebhook(num);
 
                     num--;
-                    Console.WriteLine("[" + DateTime.Now + $"] ID: {apiRun.data[num].Id}");
+                    Console.WriteLine("[" + DateTime.Now + $"] ID: {runs.data[num].Id}");
 
                     if (num != 0)
                     {
@@ -94,7 +92,7 @@ namespace ConsoleApi
             }
         }
 
-        static void DiscordWebhook(Api.RunInfo apiRun, int num)
+        static void DiscordWebhook(int num)
         {
             DiscordWebhook hook = new DiscordWebhook
             {
@@ -103,14 +101,15 @@ namespace ConsoleApi
 
             DiscordEmbed embed = new DiscordEmbed
             {
-                Title = "44s 310ms by Toyro98",
-                Url = "https://www.speedrun.com/me/run/" + apiRun.data[num].Id,
+                Title = runs.data[num].Times.Primary_t + " by " + GetUsername(runs.data[num].Players[0].Id),
+                Url = "https://www.speedrun.com/me/run/" + runs.data[num].Id,
                 Color = Color.FromArgb(42, 137, 231),
                 Thumbnail = new EmbedMedia() { Url = "https://www.speedrun.com/themes/me/cover-128.png" },
-                Author = new EmbedAuthor() { Name = "Mirror's Edge - Any%", Url = apiRun.data[num].Weblink },
+                Author = new EmbedAuthor() { Name = "Mirror's Edge - " + GetCategoryName(runs.data[num].Category), Url = runs.data[num].Weblink },
+
                 Fields = new[] {
-                    new EmbedField() { Name = "Leaderboard Rank:", Value = "n/a" },
-                    new EmbedField() { Name = "Date Played:", Value = apiRun.data[num].Submitted.ToString("yyyy-MM-dd") }
+                    new EmbedField() { Name = "Leaderboard Rank:", Value = GetLeaderboardRank(runs.data[num].Players[0].Id, num) },
+                    new EmbedField() { Name = "Date Played:", Value = runs.data[num].Submitted.ToString("yyyy-MM-dd") }
                 }
             };
 
@@ -120,6 +119,39 @@ namespace ConsoleApi
             };
 
             hook.Send(message);
+        }
+
+        static string GetUsername(string id)
+        {
+            return JsonConvert.DeserializeObject<Api.UserInfo>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id).Result).data.names.International;
+        }
+
+        static string GetLeaderboardRank(string id, int num)
+        {
+            leaderboard = JsonConvert.DeserializeObject<Api.LeaderboardInfo>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id + "/personal-bests?game=yo1yyr1q").Result);
+
+            for (int i = 0; i < leaderboard.data.Length; i++)
+            {
+                if (runs.data[num].Id == leaderboard.data[i].run.Id)
+                {
+                    return leaderboard.data[i].Place.ToString();
+                }
+            }
+
+            return "n/a";
+        }
+
+        static string GetCategoryName(string id)
+        {
+            for (int i = 0; i < category.data.Categories.Data.Length; i++)
+            {
+                if (id == category.data.Categories.Data[i].Id)
+                {
+                    return category.data.Categories.Data[i].Name;
+                }
+            }
+
+            return "n/a";
         }
     }
 }
