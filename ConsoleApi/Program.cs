@@ -36,7 +36,7 @@ namespace ConsoleApi
             while (true)
             {
                 // Checks every 10min. Just incase we don't hit the rate limit for the API
-                Thread.Sleep(TimeSpan.FromMinutes(5));
+                Thread.Sleep(TimeSpan.FromMinutes(10));
 
                 LookForNewRuns();
             }
