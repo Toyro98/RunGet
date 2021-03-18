@@ -26,7 +26,6 @@ namespace Api
             public string Examiner { get; set; }
             public DateTime Verifydate { get; set; }
         }
-
         public class Times
         {
             public string Primary { get; set; }
@@ -53,14 +52,21 @@ namespace Api
 
         public class Data
         {
+            public string Id { get; set; }
+            public Names names { get; set; }
             public int Place { get; set; }
             public Run run { get; set; }
+        }
+
+        public class Names
+        {
+            public string International { get; set; }
+            public object Japanese { get; set; }
         }
 
         public class Run
         {
             public string Id { get; set; }
-            public string Game { get; set; }
             public string Level { get; set; }
             public string Category { get; set; }
         }
@@ -84,6 +90,23 @@ namespace Api
         {
             public string Id { get; set; }
             public string Name { get; set; }
+        }
+    }
+
+    class UserInfo
+    {
+        public Data data { get; set; }
+
+        public class Data
+        {
+            public string Id { get; set; }
+            public Names names { get; set; }
+        }
+
+        public class Names
+        {
+            public string International { get; set; }
+            public object Japanese { get; set; }
         }
     }
 }
