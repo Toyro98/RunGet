@@ -15,28 +15,26 @@ namespace ConsoleApi
         static Api.Leaderboard Leaderboard;
 
         static string LatestRunID;
-        static readonly string URL_Runs = "https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q";
-        static readonly string URL_Category = "https://www.speedrun.com/api/v1/games/yo1yyr1q?embed=categories,levels";
 
         static void Main(string[] args)
         {
-            Console.Title = "RunGet v1.0";
+            Console.Title = "RunGet v1.1";
 
             // Deserialize Json
-            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync(URL_Runs).Result);
-            Category = JsonConvert.DeserializeObject<Api.Category>(new HttpClient().GetStringAsync(URL_Category).Result);
+            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q").Result);
+            Category = JsonConvert.DeserializeObject<Api.Category>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/games/yo1yyr1q?embed=categories,levels").Result);
 
             // Save the run ID
-            LatestRunID = Runs.data[0].Id.ToString();
+            LatestRunID = Runs.data[0].Id;
 
             // Write the latest it found
-            Console.WriteLine("[" + DateTime.Now + "] Latest ID found: " + LatestRunID);
+            Console.WriteLine("[" + DateTime.Now + "] Latest ID found: " + LatestRunID + " (" + Category.data.Names.International + ")");
 
             // Infinite loop 
             while (true)
             {
-                // Checks every 10min. Just incase we don't hit the rate limit for the API
-                Thread.Sleep(TimeSpan.FromMinutes(1));
+                // Checks every ~10min. Just incase we don't hit the rate limit for the API
+                Thread.Sleep(TimeSpan.FromMinutes(10));
 
                 LookForNewRuns();
             }
@@ -45,7 +43,7 @@ namespace ConsoleApi
         static void LookForNewRuns()
         {
             // Get runs from the API
-            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync(URL_Runs).Result);
+            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q").Result);
 
             int num = 0;
 
@@ -76,18 +74,21 @@ namespace ConsoleApi
                     // Save the run id 
                     if (num == 1)
                     {
-                        LatestRunID = Runs.data[0].Id.ToString();
+                        LatestRunID = Runs.data[0].Id;
                     }
 
-                    // Where the magic happens :)
+                    // Creates the embed message and sends it
                     DiscordWebhook(num);
+
+                    // Decrease the num variable once we have sent the embed message
                     num--;
 
+                    // Write to the console
                     Console.WriteLine("[" + DateTime.Now + $"] Message sent to the Discord channel. Run ID: {Runs.data[num].Id}");
 
                     if (num != 0)
                     {
-                        // Sleep for 15 seconds so it doesn't rapidly spam the channel
+                        // Sleep for ~15 seconds so it doesn't spam the channel
                         Thread.Sleep(TimeSpan.FromSeconds(15));
                     }
                 }
@@ -109,12 +110,12 @@ namespace ConsoleApi
 
                 Thumbnail = new EmbedMedia()
                 {
-                    Url = "https://www.speedrun.com/themes/me/cover-128.png"
+                    Url = "https://www.speedrun.com/themes/" + Category.data.Abbreviation + "/cover-128.png"
                 },
 
                 Author = new EmbedAuthor() 
                 { 
-                    Name = Category.data.Names.International + " - " + GetCategoryName(Runs.data[num].Category, Runs.data[num].Level, num)
+                    Name = Category.data.Names.International + " - " + GetCategoryName(Runs.data[num].Category, Runs.data[num].Level)
                 },
 
                 Fields = new[] 
@@ -132,70 +133,81 @@ namespace ConsoleApi
                 }
             };
 
+            // Puts the embed in a message
             DiscordMessage message = new DiscordMessage
             {
                 Embeds = new[] { embed }
             };
 
+            // Send the discord message with the embed
             hook.Send(message);
         }
 
         static string GetUsername(string id, int num)
         {
-            // Check if the run is a guest account or not
+            // If the run is a guest account. We can get the name without sending a request
             if (Runs.data[num].Players[0].Rel == "guest")
             {
                 return Runs.data[num].Players[0].Name;
             }
 
+            // Returns the name from id. Example: Id = "zxz9yqn8" returns "Toyro98" from the API
             return JsonConvert.DeserializeObject<Api.User>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id).Result).data.names.International;
         }
 
         static string GetLeaderboardRank(string id, int num)
         {
+            // Get all of the runners personal best from a game
             Leaderboard = JsonConvert.DeserializeObject<Api.Leaderboard>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id + "/personal-bests?game=yo1yyr1q").Result);
 
+            // Loop through all of their runs
             for (int i = 0; i < Leaderboard.data.Length; i++)
             {
                 if (Runs.data[num].Id == Leaderboard.data[i].run.Id)
                 {
+                    // If we find the run. Return the rank
                     return Leaderboard.data[i].Place.ToString();
                 }
             }
 
-            return "n/a (Obsolete)";
+            // If someone submits 2 runs and both get verified before the API updates, the slowest run will have no rank since it's obsolete
+            return "n/a *(Obsolete)*";
         }
 
-        static string GetCategoryName(string category_id, string level_id, int num)
+        static string GetCategoryName(string category_id, string level_id)
         {
+            // Empty string variables since we don't know the category and level name. Only the id
             string category_name = "";
             string level_name = "";
 
-            // IL Run?
-            if (level_id != null)
-            {
-                for (int i = 0; i < Category.data.Levels.Data.Length; i++)
-                {
-                    if (level_id == Category.data.Levels.Data[i].Id)
-                    {
-                        level_name = Category.data.Levels.Data[i].Name + ": ";
-                    }
-                }
-            }
-
+            // Get the category name
             for (int i = 0; i < Category.data.Categories.Data.Length; i++)
             {
                 if (category_id == Category.data.Categories.Data[i].Id)
                 {
+                    // Sets the variable to the category name we found
                     category_name = Category.data.Categories.Data[i].Name;
                 }
             }
 
+            // Is the run a IL run. If not, it will just return the category name
             if (level_id != null)
             {
-                return level_name + category_name;
+                // Loop though all level ids until we find the the right one 
+                for (int i = 0; i < Category.data.Levels.Data.Length; i++)
+                {
+                    if (level_id == Category.data.Levels.Data[i].Id)
+                    {
+                        // Sets the variable to the category name we found
+                        level_name = Category.data.Levels.Data[i].Name;
+                    }
+                }
+
+                // Return the level name and categort name
+                return level_name + ": " + category_name;
             }
 
+            // Return the category name
             return category_name;
         }
 
@@ -203,10 +215,10 @@ namespace ConsoleApi
         {
             TimeSpan time = TimeSpan.FromSeconds(Runs.data[num].Times.Primary_t);
 
-            // IL Run?
+            // Check if the run is a IL run
             if (Runs.data[num].Level != null)
             {
-                if (Runs.data[num].Times.Primary_t >= 60)
+                if (time.TotalSeconds >= 60)
                 {
                     return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds / 10);
                 }
@@ -215,9 +227,19 @@ namespace ConsoleApi
             } 
 
             // Check if the run is an hour long or more
-            if (Runs.data[num].Times.Primary_t >= 3600)
+            if (time.TotalSeconds >= 3600)
             {
+                if (time.Milliseconds > 0)
+                {
+                    return string.Format("{0}h {1}m {2}s {3}ms", time.Hours, time.Minutes, time.Seconds, time.Milliseconds / 10);
+                }
+
                 return string.Format("{0}h {1}m {2}s", time.Hours, time.Minutes, time.Seconds);
+            }
+
+            if (time.Milliseconds > 0)
+            {
+                return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds / 10);
             }
 
             return string.Format("{0}m {1}s", time.Minutes, time.Seconds);
