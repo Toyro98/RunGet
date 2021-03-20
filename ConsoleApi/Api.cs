@@ -58,37 +58,8 @@
             public Categories Categories { get; set; }
             public Levels Levels { get; set; }
             public Names Names { get; set; }
-            public Assets Assets { get; set; }
             public string Abbreviation { get; set; }
             public string Weblink { get; set; }
-        }
-
-        public class Assets
-        {
-            public CoverTiny Covertiny { get; set; }
-            public CoverSmall Coversmall { get; set; }
-            public CoverMedium Covermedium { get; set; }
-            public CoverLarge Coverlarge { get; set; }
-        }
-
-        public class CoverTiny
-        {
-            public string Uri { get; set; }
-        }
-
-        public class CoverSmall
-        {
-            public string Uri { get; set; }
-        }
-
-        public class CoverMedium
-        {
-            public string Uri { get; set; }
-        }
-
-        public class CoverLarge
-        {
-            public string Uri { get; set; }
         }
 
         public class Names
