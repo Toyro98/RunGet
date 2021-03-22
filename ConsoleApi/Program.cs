@@ -2,33 +2,46 @@
 using System.Drawing;
 using System.Net.Http;
 using System.Threading;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 using Discord;
 using Discord.Webhook;
 
 namespace ConsoleApi
 {
-    class Program
+    class Game
     {
-        static Api.Run Runs;
-        static Api.Category Category;
-        static Api.Leaderboard Leaderboard;
+        public string GameID { get; set; }
+        public string LatestRunID { get; set; }
+        public Api.Run Runs { get; set; }
+        public Api.Category Category { get; set; }
+        public Api.Leaderboard Leaderboard { get; set; }
+    }
 
-        static string LatestRunID;
+    class Program
+    {   
+        // A list of games to look for
+        static List<Game> speedrun = new List<Game>()
+        {
+            new Game() { GameID = "yo1yyr1q" },  // Mirror's Edge
+            new Game() { GameID = "76rkkvd8" }   // Mirror's Edge Category Extensions
+        };
 
         static void Main(string[] args)
         {
             Console.Title = "RunGet v1.1";
 
-            // Deserialize Json
-            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q").Result);
-            Category = JsonConvert.DeserializeObject<Api.Category>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/games/yo1yyr1q?embed=categories,levels").Result);
+            // Loop through all games 
+            for (int i = 0; i < speedrun.Count; i++)
+            {
+                speedrun[i].Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=" + speedrun[i].GameID).Result);
+                speedrun[i].Category = JsonConvert.DeserializeObject<Api.Category>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/games/" + speedrun[i].GameID + "?embed=categories,levels").Result);
+                speedrun[i].LatestRunID = speedrun[i].Runs.data[0].Id;
 
-            // Save the run ID
-            LatestRunID = Runs.data[0].Id;
+                Console.WriteLine("[" + DateTime.Now + "] Latest ID found: " + speedrun[i].LatestRunID + " (" + speedrun[i].Category.data.Names.International + ")");
+            }
 
-            // Write the latest it found
-            Console.WriteLine("[" + DateTime.Now + "] Latest ID found: " + LatestRunID + " (" + Category.data.Names.International + ")");
+            Console.WriteLine("[" + DateTime.Now + "] -------------------------");
 
             // Infinite loop 
             while (true)
@@ -42,60 +55,71 @@ namespace ConsoleApi
 
         static void LookForNewRuns()
         {
-            // Get runs from the API
-            Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=yo1yyr1q").Result);
-
-            int num = 0;
-
-            // Loop through all runs we get from the url
-            for (int i = 0; i < Runs.data.Length; i++)
+            // Loop through all games 
+            for (int i = 0; i < speedrun.Count; i++)
             {
-                // Checks if the latest run is new and how many new runs there are
-                if (LatestRunID == Runs.data[i].Id && num != 0)
+                // Get runs from the API
+                speedrun[i].Runs = JsonConvert.DeserializeObject<Api.Run>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/runs?status=verified&orderby=verify-date&direction=desc&game=" + speedrun[i].GameID).Result);
+
+                int num = 0;
+
+                // Loop through all runs we get from the url
+                for (int j = 0; j < speedrun[i].Runs.data.Length; j++)
                 {
-                    Console.WriteLine("[" + DateTime.Now + $"] {num} new runs found");
-                    break;
+                    // Checks if the latest run is new and how many new runs there are
+                    if (speedrun[i].LatestRunID == speedrun[i].Runs.data[j].Id && num != 0)
+                    {
+                        Console.WriteLine("[" + DateTime.Now + $"] {num} new runs found on {speedrun[i].Category.data.Names.International}");
+                        break;
+                    }
+                    else
+                    {
+                        num++;
+                    }
+                }
+
+                // If there are no new runs. Write it to the console
+                if (num == 20)
+                {
+                    Console.WriteLine("[" + DateTime.Now + $"] No new runs found on {speedrun[i].Category.data.Names.International}");
                 }
                 else
                 {
-                    num++;
-                }
-            }
-
-            // If there are no new runs. Write it to the console
-            if (num == 20)
-            {
-                Console.WriteLine("[" + DateTime.Now + $"] No new runs found");
-            }
-            else
-            {
-                while (num != 0)
-                {
-                    // Save the run id 
-                    if (num == 1)
+                    while (num != 0)
                     {
-                        LatestRunID = Runs.data[0].Id;
+                        // Save the run id 
+                        if (num == 1)
+                        {
+                            speedrun[i].LatestRunID = speedrun[i].Runs.data[0].Id;
+                        }
+
+                        num--;
+
+                        // Creates the embed message and sends it
+                        DiscordWebhook(num, i);
+
+                        // Write to the console
+                        Console.WriteLine("[" + DateTime.Now + $"] Run ID: {speedrun[i].Runs.data[num].Id} Game: {speedrun[i].Category.data.Names.International}");
+
+                        if (num == 0)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            // Sleep for ~15 seconds so it doesn't spam the channel
+                            Thread.Sleep(TimeSpan.FromSeconds(15));
+                        }
                     }
 
-                    // Creates the embed message and sends it
-                    DiscordWebhook(num);
-
-                    // Decrease the num variable once we have sent the embed message
-                    num--;
-
-                    // Write to the console
-                    Console.WriteLine("[" + DateTime.Now + $"] Message sent to the Discord channel. Run ID: {Runs.data[num].Id}");
-
-                    if (num != 0)
-                    {
-                        // Sleep for ~15 seconds so it doesn't spam the channel
-                        Thread.Sleep(TimeSpan.FromSeconds(15));
-                    }
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
                 }
+
+                Thread.Sleep(TimeSpan.FromSeconds(1));
             }
         }
 
-        static void DiscordWebhook(int num)
+        static void DiscordWebhook(int num, int index)
         {
             DiscordWebhook hook = new DiscordWebhook
             {
@@ -104,18 +128,18 @@ namespace ConsoleApi
 
             DiscordEmbed embed = new DiscordEmbed
             {
-                Title = GetFormattedTime(num) + " by " + GetUsername(Runs.data[num].Players[0].Id, num),
-                Url = Category.data.Weblink + "/run/" + Runs.data[num].Id,
+                Title = GetFormattedTime(num, index) + " by " + GetUsername(speedrun[index].Runs.data[num].Players[0].Id, num, index),
+                Url = speedrun[index].Category.data.Weblink + "/run/" + speedrun[index].Runs.data[num].Id,
                 Color = Color.FromArgb(42, 137, 231),
 
                 Thumbnail = new EmbedMedia()
                 {
-                    Url = "https://www.speedrun.com/themes/" + Category.data.Abbreviation + "/cover-128.png"
+                    Url = "https://www.speedrun.com/themes/" + speedrun[index].Category.data.Abbreviation + "/cover-128.png"
                 },
 
                 Author = new EmbedAuthor() 
                 { 
-                    Name = Category.data.Names.International + " - " + GetCategoryName(Runs.data[num].Category, Runs.data[num].Level)
+                    Name = speedrun[index].Category.data.Names.International + " - " + GetCategoryName(speedrun[index].Runs.data[num].Category, speedrun[index].Runs.data[num].Level, index)
                 },
 
                 Fields = new[] 
@@ -123,12 +147,12 @@ namespace ConsoleApi
                     new EmbedField() 
                     { 
                         Name = "Leaderboard Rank:", 
-                        Value = GetLeaderboardRank(Runs.data[num].Players[0].Id, num) 
+                        Value = GetLeaderboardRank(speedrun[index].Runs.data[num].Players[0].Id, num, index) 
                     },
                     new EmbedField() 
                     {
                         Name = "Date Played:", 
-                        Value = Runs.data[num].Date 
+                        Value = speedrun[index].Runs.data[num].Date 
                     }
                 }
             };
@@ -143,30 +167,30 @@ namespace ConsoleApi
             hook.Send(message);
         }
 
-        static string GetUsername(string id, int num)
+        static string GetUsername(string id, int num, int index)
         {
             // If the run is a guest account. We can get the name without sending a request
-            if (Runs.data[num].Players[0].Rel == "guest")
+            if (speedrun[index].Runs.data[num].Players[0].Rel == "guest")
             {
-                return Runs.data[num].Players[0].Name;
+                return speedrun[index].Runs.data[num].Players[0].Name;
             }
 
             // Returns the name from id. Example: Id = "zxz9yqn8" returns "Toyro98" from the API
             return JsonConvert.DeserializeObject<Api.User>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id).Result).data.names.International;
         }
 
-        static string GetLeaderboardRank(string id, int num)
+        static string GetLeaderboardRank(string id, int num, int index)
         {
             // Get all of the runners personal best from a game
-            Leaderboard = JsonConvert.DeserializeObject<Api.Leaderboard>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id + "/personal-bests?game=yo1yyr1q").Result);
+            speedrun[index].Leaderboard = JsonConvert.DeserializeObject<Api.Leaderboard>(new HttpClient().GetStringAsync("https://www.speedrun.com/api/v1/users/" + id + "/personal-bests?game=" + speedrun[index].GameID).Result);
 
             // Loop through all of their runs
-            for (int i = 0; i < Leaderboard.data.Length; i++)
+            for (int j = 0; j < speedrun[index].Leaderboard.data.Length; j++)
             {
-                if (Runs.data[num].Id == Leaderboard.data[i].run.Id)
+                if (speedrun[index].Runs.data[num].Id == speedrun[index].Leaderboard.data[j].run.Id)
                 {
                     // If we find the run. Return the rank
-                    return Leaderboard.data[i].Place.ToString();
+                    return speedrun[index].Leaderboard.data[j].Place.ToString();
                 }
             }
 
@@ -174,19 +198,19 @@ namespace ConsoleApi
             return "n/a *(Obsolete)*";
         }
 
-        static string GetCategoryName(string category_id, string level_id)
+        static string GetCategoryName(string category_id, string level_id, int index)
         {
             // Empty string variables since we don't know the category and level name. Only the id
             string category_name = "";
             string level_name = "";
 
             // Get the category name
-            for (int i = 0; i < Category.data.Categories.Data.Length; i++)
+            for (int j = 0; j < speedrun[index].Category.data.Categories.Data.Length; j++)
             {
-                if (category_id == Category.data.Categories.Data[i].Id)
+                if (category_id == speedrun[index].Category.data.Categories.Data[j].Id)
                 {
                     // Sets the variable to the category name we found
-                    category_name = Category.data.Categories.Data[i].Name;
+                    category_name = speedrun[index].Category.data.Categories.Data[j].Name;
                 }
             }
 
@@ -194,12 +218,12 @@ namespace ConsoleApi
             if (level_id != null)
             {
                 // Loop though all level ids until we find the the right one 
-                for (int i = 0; i < Category.data.Levels.Data.Length; i++)
+                for (int j = 0; j < speedrun[index].Category.data.Levels.Data.Length; j++)
                 {
-                    if (level_id == Category.data.Levels.Data[i].Id)
+                    if (level_id == speedrun[index].Category.data.Levels.Data[j].Id)
                     {
                         // Sets the variable to the category name we found
-                        level_name = Category.data.Levels.Data[i].Name;
+                        level_name = speedrun[index].Category.data.Levels.Data[j].Name;
                     }
                 }
 
@@ -211,27 +235,32 @@ namespace ConsoleApi
             return category_name;
         }
 
-        static string GetFormattedTime(int num)
+        static string GetFormattedTime(int num, int index)
         {
-            TimeSpan time = TimeSpan.FromSeconds(Runs.data[num].Times.Primary_t);
+            TimeSpan time = TimeSpan.FromSeconds(speedrun[index].Runs.data[num].Times.Primary_t);
 
             // Check if the run is a IL run
-            if (Runs.data[num].Level != null)
+            if (speedrun[index].Runs.data[num].Level != null)
             {
-                if (time.TotalSeconds >= 60)
+                if (time.TotalSeconds > 60)
                 {
-                    return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds / 10);
+                    if (time.Milliseconds > 10)
+                    {
+                        return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds);
+                    }
+
+                    return string.Format("{0}m {1}s 0{2}ms", time.Minutes, time.Seconds, time.Milliseconds);
                 }
 
-                return string.Format("{0}s {1}ms", time.Seconds, time.Milliseconds / 10);
+                return string.Format("{0}s {1}ms", time.Seconds, time.Milliseconds);
             } 
 
             // Check if the run is an hour long or more
-            if (time.TotalSeconds >= 3600)
+            if (time.TotalSeconds > 3600)
             {
                 if (time.Milliseconds > 0)
                 {
-                    return string.Format("{0}h {1}m {2}s {3}ms", time.Hours, time.Minutes, time.Seconds, time.Milliseconds / 10);
+                    return string.Format("{0}h {1}m {2}s {3}ms", time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
                 }
 
                 return string.Format("{0}h {1}m {2}s", time.Hours, time.Minutes, time.Seconds);
@@ -239,7 +268,7 @@ namespace ConsoleApi
 
             if (time.Milliseconds > 0)
             {
-                return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds / 10);
+                return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds);
             }
 
             return string.Format("{0}m {1}s", time.Minutes, time.Seconds);
