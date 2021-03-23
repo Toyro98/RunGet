@@ -24,7 +24,8 @@ namespace ConsoleApi
         static List<Game> speedrun = new List<Game>()
         {
             new Game() { GameID = "yo1yyr1q" },  // Mirror's Edge
-            new Game() { GameID = "76rkkvd8" }   // Mirror's Edge Category Extensions
+            new Game() { GameID = "76rkkvd8" },  // Mirror's Edge Category Extensions
+            // new Game() { GameID = "m1mgl312" }   // Mirror's Edge Catalyst
         };
 
         static void Main(string[] args)
@@ -99,7 +100,7 @@ namespace ConsoleApi
                         DiscordWebhook(num, i);
 
                         // Write to the console
-                        Console.WriteLine("[" + DateTime.Now + $"] Run ID: {speedrun[i].Runs.data[num].Id} Game: {speedrun[i].Category.data.Names.International}");
+                        Console.WriteLine("[" + DateTime.Now + $"] Run ID: {speedrun[i].Runs.data[num].Id}");
 
                         if (num == 0)
                         {
@@ -107,8 +108,8 @@ namespace ConsoleApi
                         }
                         else
                         {
-                            // Sleep for ~15 seconds so it doesn't spam the channel
-                            Thread.Sleep(TimeSpan.FromSeconds(15));
+                            // Sleep for ~5 seconds so it doesn't spam the channel
+                            Thread.Sleep(TimeSpan.FromSeconds(5));
                         }
                     }
 
@@ -160,6 +161,8 @@ namespace ConsoleApi
             // Puts the embed in a message
             DiscordMessage message = new DiscordMessage
             {
+                Username = "Run Get 3.0",
+                AvatarUrl = "https://raw.githubusercontent.com/Toyro98/RunGet/main/ConsoleApi/Image/Avatar.png",
                 Embeds = new[] { embed }
             };
 
@@ -227,7 +230,7 @@ namespace ConsoleApi
                     }
                 }
 
-                // Return the level name and categort name
+                // Return the level name and category name
                 return level_name + ": " + category_name;
             }
 
@@ -239,39 +242,40 @@ namespace ConsoleApi
         {
             TimeSpan time = TimeSpan.FromSeconds(speedrun[index].Runs.data[num].Times.Primary_t);
 
-            // Check if the run is a IL run
-            if (speedrun[index].Runs.data[num].Level != null)
-            {
-                if (time.TotalSeconds > 60)
-                {
-                    if (time.Milliseconds > 10)
-                    {
-                        return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds);
-                    }
-
-                    return string.Format("{0}m {1}s 0{2}ms", time.Minutes, time.Seconds, time.Milliseconds);
-                }
-
-                return string.Format("{0}s {1}ms", time.Seconds, time.Milliseconds);
-            } 
-
+            // There's probably a better way to do this but this works just fine
             // Check if the run is an hour long or more
             if (time.TotalSeconds > 3600)
             {
-                if (time.Milliseconds > 0)
+                if (time.Milliseconds == 0)
                 {
-                    return string.Format("{0}h {1}m {2}s {3}ms", time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+                    // 1h 23m 45s
+                    return string.Format("{0}h {1}m {2}s", time.Hours, time.Minutes, time.Seconds);
                 }
 
-                return string.Format("{0}h {1}m {2}s", time.Hours, time.Minutes, time.Seconds);
-            }
+                // 1h 23m 45s 670ms
+                return string.Format("{0}h {1}m {2}s {3}ms", time.Hours, time.Minutes, time.Seconds, time.Milliseconds);
+            } 
 
-            if (time.Milliseconds > 0)
+            if (time.TotalSeconds > 60)
             {
+                if (time.Milliseconds == 0)
+                {
+                    // 23m 45s
+                    return string.Format("{0}m {1}s", time.Minutes, time.Seconds);
+                }
+
+                // 23m 45s 670ms
                 return string.Format("{0}m {1}s {2}ms", time.Minutes, time.Seconds, time.Milliseconds);
             }
 
-            return string.Format("{0}m {1}s", time.Minutes, time.Seconds);
+            if (time.Milliseconds == 0)
+            {
+                // 45s
+                return string.Format("{0}s", time.Seconds);
+            }
+
+            // 45s 670ms
+            return string.Format("{0}s {1}ms", time.Seconds, time.Milliseconds);
         }
     }
 }
