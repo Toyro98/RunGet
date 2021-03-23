@@ -80,10 +80,10 @@
 
         public class Levels
         {
-            public Datum2[] Data { get; set; }
+            public Datum1[] Data { get; set; }
         }
 
-        public class Datum2
+        public class Datum1
         {
             public string Id { get; set; }
             public string Name { get; set; }
