@@ -9,6 +9,8 @@ Before using the weblink, there was a discord bot to look for new runs. But it w
 ## Library Used
 - [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (v12.0.3)
 - [CSharpDiscordWebhook](https://github.com/N4T4NM/CSharpDiscordWebhook) (v2.1)
+- [SharpConfig](https://github.com/cemdervis/SharpConfig) (v3.2.9.1)
+- [Colorful.Console](https://github.com/tomakita/Colorful.Console) (v1.2.0)
 
 ## Todo
 - [ ] Learn what async is and use it in the program
@@ -16,8 +18,7 @@ Before using the weblink, there was a discord bot to look for new runs. But it w
 - [ ] Support variables. Example: Training% - **No Tab skip** and Training% - **with Tab skip**
 - [ ] Support multiple players in a run (Only for Mirror's Edge Category Extentions)
 - [ ] Handle status codes from API
-  - If status "420" from speedrun API, wait 30min and try again
+  - speedrun
+  - discord
 - [ ] Display error messages
-  - Show status from API if too many request has been sent and other unexpected errors
-- [ ] Manually send webhook message
-  - If program crashed or save each latest run to a .ini file and read from that at start
+  - If there's no internet connection
