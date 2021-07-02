@@ -7,18 +7,14 @@ Before using the weblink, there was a discord bot to look for new runs. But it w
 ![](https://raw.githubusercontent.com/Toyro98/RunGet/main/ConsoleApi/Image/EmbedExample.png)
 
 ## Library Used
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (v12.0.3)
-- [CSharpDiscordWebhook](https://github.com/N4T4NM/CSharpDiscordWebhook) (v2.1)
-- [SharpConfig](https://github.com/cemdervis/SharpConfig) (v3.2.9.1)
-- [Colorful.Console](https://github.com/tomakita/Colorful.Console) (v1.2.0)
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (12.0.3)
+- [CSharpDiscordWebhook](https://github.com/N4T4NM/CSharpDiscordWebhook) (2.1)
 
 ## Todo
 - [ ] Learn what async is and use it in the program
 - [ ] Better Json Structure
 - [ ] Support variables. Example: Training% - **No Tab skip** and Training% - **with Tab skip**
-- [ ] Support multiple players in a run (Only for Mirror's Edge Category Extentions)
+- [x] Support multiple players in a run
 - [ ] Handle status codes from API
   - speedrun
   - discord
-- [ ] Display error messages
-  - If there's no internet connection
