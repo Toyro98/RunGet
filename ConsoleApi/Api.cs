@@ -7,11 +7,19 @@
         public class Data
         {
             public string Id { get; set; }
+            public string Weblink { get; set; }
             public string Level { get; set; }
             public string Category { get; set; }
             public Player[] Players { get; set; }
             public string Date { get; set; }
             public Times Times { get; set; }
+            public System System { get; set; }
+            public Status Status { get; set; }
+        }
+
+        public class Status
+        {
+            public string Examiner { get; set; }
         }
 
         public class Times
@@ -24,6 +32,11 @@
             public string Rel { get; set; }
             public string Id { get; set; }
             public string Name { get; set; }
+        }
+
+        public class System
+        {
+            public string Platform { get; set; }
         }
     }
 
@@ -102,6 +115,18 @@
         public class Names
         {
             public string International { get; set; }
+        }
+    }
+
+    class Platform
+    {
+        public Data data { get; set; }
+
+        public class Data
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+            public int Released { get; set; }
         }
     }
 }
