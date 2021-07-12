@@ -404,32 +404,44 @@ namespace ConsoleApi
         {
             TimeSpan time = TimeSpan.FromSeconds(timer);
 
-            // I haven't come up with a better variable name yet
             Dictionary<string, int> a = new Dictionary<string, int>() { };
             a.Add("ms", time.Milliseconds);
-            a.Add("s",  time.Seconds);
-            a.Add("m",  time.Minutes);
             a.Add("h",  time.Hours);
             a.Add("d",  time.Days);
+            // Create an empty dictionary 
+            Dictionary<string, int> timeDictionary = new Dictionary<string, int>() {};
 
+            // Add the data from the timespan
+            timeDictionary.Add("ms", time.Milliseconds);
+            timeDictionary.Add("s", time.Seconds);
+            timeDictionary.Add("m", time.Minutes);
+            timeDictionary.Add("h", time.Hours);
+            timeDictionary.Add("d", time.Days);
+
+            // Empty string variable
             string timerString = string.Empty;
 
-            foreach (var item in a)
+            // Loop through the dictionary 
+            foreach (var item in timeDictionary)
             {
+                // Check if the value is higher than 0. So we don't have to print 0h 0m 32s 0ms and instead print 32s
                 if (item.Value > 0)
                 {
+                    // Check if milliseconds is eiher than 0. If milliseconds is 50. It would print 5ms instead of 050ms
                     if (item.Key.Contains("ms") && item.Value > 0)
                     {
-                        // Ternary operator
+                        // If true, the milliseconds is added first and checks if it should add zeros to it
                         timerString = timerString.Insert(0, ((item.Value < 9) ? "00" : ((item.Value < 99) ? "0" : "")) + item.Value + item.Key + " ");
                     } 
                     else
                     {
+                        // Insert the time and suffix to the string
                         timerString = timerString.Insert(0, item.Value + item.Key + " ");
                     }
                 }
             }
 
+            // Returns the time like for example: 4m 20s 690ms
             return timerString;
         }
 
