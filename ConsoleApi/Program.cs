@@ -403,11 +403,7 @@ namespace ConsoleApi
         static string GetFormattedTime(float timer)
         {
             TimeSpan time = TimeSpan.FromSeconds(timer);
-
-            Dictionary<string, int> a = new Dictionary<string, int>() { };
-            a.Add("ms", time.Milliseconds);
-            a.Add("h",  time.Hours);
-            a.Add("d",  time.Days);
+            
             // Create an empty dictionary 
             Dictionary<string, int> timeDictionary = new Dictionary<string, int>() {};
 
