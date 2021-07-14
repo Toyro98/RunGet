@@ -2,9 +2,9 @@
 {
     class Run
     {
-        public Data[] data { get; set; }
+        public Datum[] Data { get; set; }
 
-        public class Data
+        public class Datum
         {
             public string Id { get; set; }
             public string Weblink { get; set; }
@@ -42,9 +42,9 @@
 
     class Leaderboard
     {
-        public Data[] data { get; set; }
+        public Datum[] Data { get; set; }
 
-        public class Data
+        public class Datum
         {
             public Names names { get; set; }
             public int Place { get; set; }
@@ -64,9 +64,9 @@
 
     class Category
     {
-        public Data data { get; set; }
+        public Datum Data { get; set; }
 
-        public class Data
+        public class Datum
         {
             public Categories Categories { get; set; }
             public Levels Levels { get; set; }
@@ -82,17 +82,6 @@
 
         public class Categories
         {
-            public Datum[] Data { get; set; }
-        }
-
-        public class Datum
-        {
-            public string Id { get; set; }
-            public string Name { get; set; }
-        }
-
-        public class Levels
-        {
             public Datum1[] Data { get; set; }
         }
 
@@ -101,13 +90,24 @@
             public string Id { get; set; }
             public string Name { get; set; }
         }
+
+        public class Levels
+        {
+            public Datum2[] Data { get; set; }
+        }
+
+        public class Datum2
+        {
+            public string Id { get; set; }
+            public string Name { get; set; }
+        }
     }
 
     class User
     {
-        public Data data { get; set; }
+        public Datum Data { get; set; }
 
-        public class Data
+        public class Datum
         {
             public Names names { get; set; }
         }
@@ -120,9 +120,9 @@
 
     class Platform
     {
-        public Data data { get; set; }
+        public Datum Data { get; set; }
 
-        public class Data
+        public class Datum
         {
             public string Id { get; set; }
             public string Name { get; set; }
