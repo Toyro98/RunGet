@@ -4,17 +4,9 @@ This was specially made for Mirror's Edge Speedrun community on Discord. Before,
 Before using the weblink, there was a discord bot to look for new runs. But it was a gamble if it would show a run or not. Now it should get every run that is new from Mirror's Edge and the category extentions
 
 ## Embed Message Example
-![](https://raw.githubusercontent.com/Toyro98/RunGet/main/ConsoleApi/Image/EmbedExample.png)
+![](https://raw.githubusercontent.com/Toyro98/RunGet/main/RunGet/src/image/EmbedExample.png)
 
-## Library Used
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (12.0.3)
-- [CSharpDiscordWebhook](https://github.com/N4T4NM/CSharpDiscordWebhook) (2.1)
-
-## Todo
-- [ ] Learn what async is and use it in the program
-- [ ] Better Json Structure
-- [ ] Support variables. Example: Training% - **No Tab skip** and Training% - **with Tab skip**
-- [x] Support multiple players in a run
-- [ ] Handle status codes from API
-  - speedrun
-  - discord
+## Packages Used
+- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) (13.0.1)
+- [CSharpDiscordWebhook](https://github.com/N4T4NM/CSharpDiscordWebhook) (2.2.0)
+- [Pastel](https://github.com/silkfire/Pastel) (2.1.0)
