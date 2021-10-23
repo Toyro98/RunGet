@@ -47,7 +47,7 @@ namespace RunGet
             catch (HttpRequestException error)
             {
                 // No internet connection
-                Console.Write("[{0}] {1} Trying again in 10 min.", DateTime.Now.ToString().Pastel("#808080"), error.Message);
+                Console.WriteLine("[{0}] {1} Trying again in 10 min.", DateTime.Now.ToString().Pastel("#808080"), error.Message);
 
                 // Return null
                 return null;
