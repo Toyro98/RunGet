@@ -53,13 +53,14 @@ namespace RunGet
                     Thread.Sleep(TimeSpan.FromMinutes(5));
                     goto TryAgain;
                 }
+
                 // Set latest run id it found when starting program
                 games[i].LatestRunID = games[i].Runs.Data[0].Id;
 
-                Console.WriteLine("[{0}] Latest Run ID: {1} | {2}", DateTime.Now.ToString().Pastel("#808080"), games[i].LatestRunID.Pastel("#808080"), games[i].Runs.Data[0].Game.Data.Names.International.Pastel("#808080"));
+                Console.WriteLine("[{0}] Latest Run ID: {1} | Game: {2}", DateTime.Now.ToString().Pastel("#808080"), games[i].LatestRunID.Pastel("#808080"), games[i].Runs.Data[0].Game.Data.Names.International.Pastel("#808080"));
             }
 
-            Console.WriteLine("".PadRight(92, '='));
+            Console.WriteLine("".PadRight(112, '='));
         }
 
         public static void LookForNewRuns() 

@@ -14,10 +14,14 @@ namespace RunGet
         public static async Task<string> Get(string uri)
         {
             // Client
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri("https://www.speedrun.com/api/v1/");
+            HttpClient client = new HttpClient
+            {
+                BaseAddress = new Uri("https://www.speedrun.com/api/v1/")
+            };
+
+            // Headers
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/2.0.0");
+            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/2.0.1");
 
             // Try to send a get request
             try
@@ -32,24 +36,18 @@ namespace RunGet
                 // Check if the status code is 200
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    // Return data 
                     return await Task.FromResult(data).ConfigureAwait(false);
                 }
                 else
                 {
                     // Display error details. Most likely 420(Ratelimit) or 502 Badgateway
-                    Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 10 min.", DateTime.Now.ToString().Pastel("#808080"), response.StatusCode, response.ReasonPhrase);
+                    Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", DateTime.Now.ToString().Pastel("#808080"), response.StatusCode, response.ReasonPhrase);
 
-                    // Return null
                     return null;
                 }
             }
-            catch (HttpRequestException error)
+            catch (Exception)
             {
-                // No internet connection
-                Console.WriteLine("[{0}] {1} Trying again in 10 min.", DateTime.Now.ToString().Pastel("#808080"), error.Message);
-
-                // Return null
                 return null;
             }
         }
