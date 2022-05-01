@@ -10,16 +10,8 @@ namespace RunGet
     {
         public static string GetCategoryName(int num, RunsAPI.Root runs, string defaultPlatformName)
         {
-            string platform = runs.Data[num].Platform.Data.Name;
-            string category = runs.Data[num].Category.Data.Name;
-            string level = string.Empty;
             string value = string.Empty;
-
-            if (runs.Data[num].Level != null)
-            {
-                level = runs.Data[num].Level.Data.Name;
-            }
-
+            string platform = IsPlatformNameDefault(runs.Data[num].Platform.Data.Name, defaultPlatformName);
             List<string> values = new List<string>();
 
             // Get variables names if there are any
@@ -61,12 +53,12 @@ namespace RunGet
                 if (string.IsNullOrEmpty(value))
                 {
                     // Example: Any% (Xbox360)
-                    return category + IsPlatformNameDefault(platform, defaultPlatformName);
+                    return runs.Data[num].Category.Data.Name + platform;
                 }
                 else
                 {
                     // Example: Any% - Macro, Steam (Linux)
-                    return category + " - " + value + IsPlatformNameDefault(platform, defaultPlatformName);
+                    return runs.Data[num].Category.Data.Name + " - " + value + platform;
                 }
             }
             else
@@ -74,12 +66,12 @@ namespace RunGet
                 if (string.IsNullOrEmpty(value))
                 {
                     // Example: Stormdrains One: TAS - Any% (Mac)
-                    return level + ": " + category + IsPlatformNameDefault(platform, defaultPlatformName);
+                    return runs.Data[num].Level.Data.Name + ": " + runs.Data[num].Category.Data.Name + platform;
                 }
                 else
                 {
                     // Example: Stormdrains One: TAS - Any%, Macro, Australian Mode
-                    return level + ": " + category + " - " + value + IsPlatformNameDefault(platform, defaultPlatformName);
+                    return runs.Data[num].Level.Data.Name + ": " + runs.Data[num].Category.Data.Name + " - " + value + platform;
                 }
             }
         }
