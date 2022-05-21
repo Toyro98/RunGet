@@ -1,20 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace RunGet
 {
-    public class RunsAPI
+    public class RunsApi
     {
         public class Root
         {
-            public Datum[] Data { get; set; }
+            public Data[] Data { get; set; }
         }
 
-        public class Datum
+        public class Data
         {
             public string Id { get; set; }
             public string Weblink { get; set; }
@@ -45,20 +42,7 @@ namespace RunGet
             public GameNames Names { get; set; }
             public string Abbreviation { get; set; }
             public string Weblink { get; set; }
-            public GameRuleset Ruleset { get; set; }
             public GameAssets Assets { get; set; }
-        }
-
-        public class GameRuleset
-        {
-            [JsonProperty("show-milliseconds")]
-            public bool ShowMilliseconds { get; set; }
-
-            [JsonProperty("run-times")]
-            public List<string> Runtimes { get; set; }
-
-            [JsonProperty("default-time")]
-            public string DefaultTime { get; set; }
         }
 
         public class GameNames
@@ -87,11 +71,12 @@ namespace RunGet
         public class CategoryVariablesData
         {
             public string Id { get; set; }
+            public string Name { get; set; }
             public string Category { get; set; }
             public CategoryVariablesValues Values { get; set; }
 
             [JsonProperty("is-subcategory")]
-            public bool Issubcategory { get; set; }
+            public bool IsSubCategory { get; set; }
         }
 
         public class CategoryVariablesValues
@@ -153,12 +138,29 @@ namespace RunGet
             public string Id { get; set; }
             public string Name { get; set; }
             public PlayerNames Names { get; set; }
-            public string Weblink { get; set; }
+            public Location Location { get; set; }
         }
 
         public class PlayerNames
         {
             public string International { get; set; }
+        }
+
+        public class Location
+        {
+            public Country Country { get; set; }
+        }
+
+        public class Country
+        {
+            public string Code { get; set; }
+            public CountryNames Names { get; set; }
+        }
+
+        public class CountryNames
+        {
+            public string International { get; set; }
+            public string Japanese { get; set; }
         }
 
         public class Times

@@ -4,12 +4,13 @@ using Pastel;
 
 namespace RunGet
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args) 
+        public static void Main(string[] args) 
         {
             // Get the latests run id from the API
             Runs.GetLatestRunId();
+            Utils.Seperator();
 
             // Infinite loop
             while (true)
@@ -24,9 +25,14 @@ namespace RunGet
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("".PadRight(112, '='));
-                    Console.WriteLine("[{0}] {1}\n", DateTime.Now.ToString().Pastel("#808080"), "Error!! :(".Pastel("#8C0000"));
-                    Console.WriteLine(ex.ToString());
+                    Utils.Seperator();
+
+                    Console.WriteLine("[{0}] {1}\n\n{2}", 
+                        DateTime.Now.ToString().Pastel("#808080"), 
+                        "Error!!".Pastel("#8C0000"), 
+                        ex.ToString()
+                    );
+
                     Console.ReadLine();
                     Environment.Exit(0);
                 }

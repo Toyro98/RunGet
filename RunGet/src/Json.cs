@@ -4,7 +4,7 @@ namespace RunGet
 {
     public static class Json
     {
-        public static RunsAPI.Root DeserializeRuns(string data)
+        public static RunsApi.Data[] DeserializeRuns(string data)
         {
             // Check if data is null before continuing 
             if (data == null)
@@ -13,7 +13,7 @@ namespace RunGet
             }
 
             // Deserialize data
-            RunsAPI.Root api = JsonConvert.DeserializeObject<RunsAPI.Root>(data);
+            RunsApi.Root api = JsonConvert.DeserializeObject<RunsApi.Root>(data);
 
             int num = 0;
 
@@ -23,15 +23,15 @@ namespace RunGet
                 // If levels data length is longer than 25. Then we know it's not null and then we deserialize the level data
                 if (item.Levels.ToString().Length > 25)
                 {
-                    api.Data[num].Level = JsonConvert.DeserializeObject<RunsAPI.Level>(api.Data[num].Levels.ToString());
+                    api.Data[num].Level = JsonConvert.DeserializeObject<RunsApi.Level>(api.Data[num].Levels.ToString());
                 }
 
                 num++;
             }
 
-            return api;
+            return api.Data;
         }
 
-        public static LeaderboardAPI.Root DeserializeLeaderboard(string data) => data == null ? null : JsonConvert.DeserializeObject<LeaderboardAPI.Root>(data);
+        public static T Deserialize<T>(string data) => data == null ? default : JsonConvert.DeserializeObject<T>(data);
     }
 }

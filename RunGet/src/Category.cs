@@ -1,83 +1,71 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RunGet
 {
     public class Category
     {
-        public static string GetCategoryName(int num, RunsAPI.Root runs, string defaultPlatformName)
+        public static string GetCategoryName(RunsApi.Data runs)
         {
-            string value = string.Empty;
-            string platform = IsPlatformNameDefault(runs.Data[num].Platform.Data.Name, defaultPlatformName);
-            List<string> values = new List<string>();
+            string variables = string.Empty;
+            List<string> variableNames = new List<string>();
 
             // Get variables names if there are any
-            if (runs.Data[num].Values.Count > 0)
+            if (runs.Values.Count > 0)
             {
-                foreach (var item in runs.Data[num].Values)
+                foreach (var item in runs.Values)
                 {
-                    foreach (var varCategory in runs.Data[num].Category.Data.Variables.Data)
+                    foreach (var category in runs.Category.Data.Variables.Data)
                     {
-                        foreach (var varCategoryData in varCategory.Values.Values)
+                        foreach (var categoryData in category.Values.Values)
                         {
-                            if (item.Value == varCategoryData.Key && varCategory.Issubcategory)
+                            if (item.Value == categoryData.Key && category.IsSubCategory)
                             {
-                                values.Add(varCategoryData.Value.Label);
+                                variableNames.Add(categoryData.Value.Label);
                             }
+                        }
+                    }
+                }
+
+                // Add the variables names to the string
+                if (variableNames.Count > 0)
+                {
+                    for (int i = 0; i < variableNames.Count; i++)
+                    {
+                        if (i == 0)
+                        {
+                            variables += variableNames[i];
+                        }
+                        else
+                        {
+                            variables += ", " + variableNames[i];
                         }
                     }
                 }
             }
 
-            // Add the variables names to the string
-            if (values.Count > 0)
+            if (runs.Category.Data.Type == "per-game")
             {
-                for (int i = 0; i < values.Count; i++)
+                if (string.IsNullOrEmpty(variables))
                 {
-                    if (i == 0)
-                    {
-                        value += values[i];
-                    }
-                    else
-                    {
-                        value += ", " + values[i];
-                    }
+                    return runs.Category.Data.Name;
                 }
+
+                return runs.Category.Data.Name + " - " + variables;
             }
 
-            if (runs.Data[num].Category.Data.Type == "per-game")
+            if (string.IsNullOrEmpty(variables))
             {
-                if (string.IsNullOrEmpty(value))
-                {
-                    // Example: Any% (Xbox360)
-                    return runs.Data[num].Category.Data.Name + platform;
-                }
-                else
-                {
-                    // Example: Any% - Macro, Steam (Linux)
-                    return runs.Data[num].Category.Data.Name + " - " + value + platform;
-                }
+                return runs.Level.Data.Name + ": " + runs.Category.Data.Name;
             }
-            else
-            {
-                if (string.IsNullOrEmpty(value))
-                {
-                    // Example: Stormdrains One: TAS - Any% (Mac)
-                    return runs.Data[num].Level.Data.Name + ": " + runs.Data[num].Category.Data.Name + platform;
-                }
-                else
-                {
-                    // Example: Stormdrains One: TAS - Any%, Macro, Australian Mode
-                    return runs.Data[num].Level.Data.Name + ": " + runs.Data[num].Category.Data.Name + " - " + value + platform;
-                }
-            }
+
+            return runs.Level.Data.Name + ": " + runs.Category.Data.Name + " - " + variables;
         }
 
-        private static string IsPlatformNameDefault(string platformName, string defaultPlatformName)
+        public static string GetPlatformName(string platformName, string defaultPlatformName)
         {
+            // TODO: Improve this, some games have the platform when displaying the variables
+            // For example "Super Mario 64 - 16 Star - N64" which N64 is the platform
+            
             if (string.IsNullOrWhiteSpace(platformName))
             {
                 return " (" + platformName + ")";

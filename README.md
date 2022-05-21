@@ -1,9 +1,14 @@
 # RunGet
-This was specially made for the Mirror's Edge Speedrun community on Discord. Before I created this, I made a php version that would send a webhook message but you had to open a link and sometimes the mods would forget and it would take ~30 min before the API updated. However, you could only send one run at the time. Basically that method wasn't the best. Instead of having to manually open a link for it to send a message, it will now do it automatically, if the program is running. 
+This was specially made for the Mirror's Edge Speedrun community on Discord. What it does, it looks for new runs every 5 minutes from an API. If it finds a new run id, it will send a embeded message to a discord channel. If it finds multiple new runs, it will send those too.
 
-What it does, it looks for new runs every ~5 minutes from an API. If it finds a new run id from any Mirror's Edge game, it will send a embeded message to a discord channel. If it finds multiple new runs, it will send those too.
+Before using this, there was a discord bot to look for new runs. It was a gamble if it would show a run or not. Now it will get every run that is recently verified.
 
-Before using this and the weblink, there was a discord bot to look for new runs. It was a gamble if it would show a run or not. Now it will get every run that is new from Mirror's Edge and the category extentions.
+## Embed Message Examples
+Runner improves on a world record. Show how much was improved from previous world record
+![](https://i.imgur.com/xE5si0q.png)
 
-## Embed Message Example
-![](https://raw.githubusercontent.com/Toyro98/RunGet/main/RunGet/src/image/EmbedExample.png)
+If the run wasn't a new world record and if they already had a personal best. Show how much was improved on previous personal best
+![](https://i.imgur.com/ETz41UB.png)
+
+First time the runner submitted a run in a category/level and it wasn't world record. Doesn't show the extra info
+![](https://i.imgur.com/ZJ1ugjM.png)

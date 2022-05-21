@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Pastel;
 
@@ -21,7 +18,7 @@ namespace RunGet
 
             // Headers
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/2.0.1");
+            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/" + Utils.GetVersion());
 
             // Try to send a get request
             try
@@ -31,7 +28,7 @@ namespace RunGet
                 string data = await response.Content.ReadAsStringAsync();
 
                 // Update Stats
-                Title.UpdateTitle(api: 1);
+                Title.Update(api: 1);
 
                 // Check if the status code is 200
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -41,7 +38,11 @@ namespace RunGet
                 else
                 {
                     // Display error details. Most likely 420(Ratelimit) or 502 Badgateway
-                    Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", DateTime.Now.ToString().Pastel("#808080"), response.StatusCode, response.ReasonPhrase);
+                    Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", 
+                        DateTime.Now.ToString().Pastel("#808080"), 
+                        response.StatusCode, 
+                        response.ReasonPhrase
+                    );
 
                     return null;
                 }

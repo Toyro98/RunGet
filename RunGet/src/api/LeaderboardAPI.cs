@@ -1,47 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-
-namespace RunGet
+﻿namespace RunGet
 {
-    public class LeaderboardAPI
+    public struct LeaderboardApi
     {
-        public class Root
+        public struct Root
         {
-            public Datum Data { get; set; }
+            public Data Data { get; set; }
         }
 
-        public class Datum
+        public struct Data
         {
             public Runs[] Runs { get; set; }
+            public RunsApi.Players Players { get; set; }
         }
 
-        public class Runs
+        public struct Runs
         {
             public int Place { get; set; }
-            [JsonProperty("run")]
             public Run Run { get; set; }
         }
 
-        public class Run
+        public struct Run
         {
             public string Id { get; set; }
-            public string Weblink { get; set; }
             public string Game { get; set; }
             public string Level { get; set; }
             public string Category { get; set; }
-            public Players[] Players { get; set; }
-        }
-
-        public class Players
-        {
-            public string Rel { get; set; }
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string Uri { get; set; }
+            public RunsApi.Times Times { get; set; }
+            public RunsApiLight.Players[] Players { get; set; }
         }
     }
 }
