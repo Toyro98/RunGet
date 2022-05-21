@@ -6,9 +6,15 @@ Before using this, there was a discord bot to look for new runs. It was a gamble
 ## Embed Message Examples
 Runner improves on a world record. Show how much was improved from previous world record
 ![](https://i.imgur.com/xE5si0q.png)
+<br>
 
+<br>
 If the run wasn't a new world record and if they already had a personal best. Show how much was improved on previous personal best
-![](https://i.imgur.com/ETz41UB.png)
 
+![](https://i.imgur.com/ETz41UB.png)
+<br>
+
+<br>
 First time the runner submitted a run in a category/level and it wasn't world record. Doesn't show the extra info
+
 ![](https://i.imgur.com/ZJ1ugjM.png)
