@@ -1,3 +1,7 @@
+## 1.3.1
+### Fixed
+  - NullReferenceException thrown in Runs.cs inside GetLatestData method (![3048ed0](https://github.com/Toyro98/RunGet/commit/3048ed0)) 
+
 ## 1.3
 ### Added
   - Display time difference in the embed
