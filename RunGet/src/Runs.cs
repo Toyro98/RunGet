@@ -141,8 +141,8 @@ namespace RunGet
             {
                 data = Json.DeserializeRuns(Https.Get(url).Result);
 
-                // If it's 0 length, sleep for 5 min and try again
-                if (data.Length == 0 || data == null)
+                // If data is null or 0 length, sleep for 5 min
+                if (data == null || data.Length == 0)
                 {
                     data = Array.Empty<RunsApi.Data>();
                     Thread.Sleep(TimeSpan.FromMinutes(5));
