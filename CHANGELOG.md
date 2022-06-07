@@ -1,3 +1,7 @@
+## 1.3.2
+### Fixed
+  - Time difference not returning correctly if the new world record was done by same runner
+
 ## 1.3.1
 ### Fixed
   - NullReferenceException thrown in Runs.cs inside GetLatestData method (![3048ed0](https://github.com/Toyro98/RunGet/commit/3048ed0)) 
