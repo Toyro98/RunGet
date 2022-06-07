@@ -47,35 +47,10 @@ namespace RunGet
         public static string GetTimeDifference(RunsApi.Data run)
         {
             float timeDiff;
-            string urlPath;
-            string variablesPath = string.Empty;
-            string categoryAndLevelPath = "&category=" + run.Category.Data.Id;
-
-            if (run.Values.Count > 0)
-            {
-                variablesPath = Utils.GetVariablesPath(run);
-            }
-
-            if (run.Level != null)
-            {
-                categoryAndLevelPath += "&level=" + run.Level.Data.Id;
-            }
-
-            if (run.Players.Data[0].Rel == "user")
-            {
-                urlPath = "runs?user=" + run.Players.Data[0].Id; 
-            }
-            else
-            {
-                urlPath = "runs?user=" + run.Players.Data[0].Name;
-            }
-
-            urlPath += "&game=" + run.Game.Data.Id + categoryAndLevelPath + (string.IsNullOrEmpty(variablesPath) == true ? "" : "&" + variablesPath) +
-                "&status=verified&orderby=date&direction=desc";
 
             // Get the user's personalbest from the Api
             // No need to request more data since we're looking for the latest runs with the same category, level and variables
-            RunsApiLight.Root personalBests = Json.Deserialize<RunsApiLight.Root>(Https.Get(urlPath).Result);
+            RunsApiLight.Root personalBests = Json.Deserialize<RunsApiLight.Root>(Https.Get(GetUrlPath(run)).Result);
 
             if (personalBests.Data.Length >= 2)
             {
@@ -101,11 +76,47 @@ namespace RunGet
         public static string GetTimeDifferenceWorldRecord(RunsApi.Data run)
         {
             LeaderboardApi.Root leaderboard = Rank.GetLeaderboardDataFromAPI(run);
+            RunsApiLight.Root personalBests = Json.Deserialize<RunsApiLight.Root>(Https.Get(GetUrlPath(run)).Result);
 
             if (leaderboard.Data.Runs.Length >= 2)
             {
                 float currentWorldRecord = leaderboard.Data.Runs[0].Run.Times.Primary_t;
-                float previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
+                float previousWorldRecord = float.MaxValue;
+
+                if (personalBests.Data.Length >= 2)
+                {
+                    for (int i = 0; i < personalBests.Data.Length; i++)
+                    {
+                        // For old runs, this can be null
+                        if (personalBests.Data[i].Date == null)
+                        {
+                            continue;
+                        }
+
+                        // Compares the datetime and return either 0, 1, or -1
+                        // https://docs.microsoft.com/en-us/dotnet/api/system.datetime.compare?view=net-6.0#returns
+                        int result = DateTime.Compare((DateTime)personalBests.Data[i].Date, (DateTime)leaderboard.Data.Runs[1].Run.Date);
+
+                        if (result == 1)
+                        {
+                            if (previousWorldRecord > personalBests.Data[i].Times.Primary_t)
+                            {
+                                if (currentWorldRecord != personalBests.Data[i + 1].Times.Primary_t) 
+                                {
+                                    previousWorldRecord = personalBests.Data[i + 1].Times.Primary_t;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // After checking personal bests, checks if the time is bigger than 2nd place holder
+                // If runner had less than 2 runs, then "previousWorldRecord" will be float.MaxValue and we get the 2nd place time 
+                if (previousWorldRecord == float.MaxValue || previousWorldRecord > leaderboard.Data.Runs[1].Run.Times.Primary_t)
+                {
+                    previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
+                }
 
                 // If new world record is tied with previous world record then don't show "Improved World Record by"
                 if (previousWorldRecord - currentWorldRecord != 0f)
@@ -172,6 +183,35 @@ namespace RunGet
 
             // No previous runs or too few runs to get time difference
             return 0f;
+        }
+
+        private static string GetUrlPath(RunsApi.Data run)
+        {
+            string urlPath;
+            string variablesPath = string.Empty;
+            string categoryAndLevelPath = "&category=" + run.Category.Data.Id;
+
+            if (run.Values.Count > 0)
+            {
+                variablesPath = Utils.GetVariablesPath(run);
+            }
+
+            if (run.Level != null)
+            {
+                categoryAndLevelPath += "&level=" + run.Level.Data.Id;
+            }
+
+            if (run.Players.Data[0].Rel == "user")
+            {
+                urlPath = "runs?user=" + run.Players.Data[0].Id;
+            }
+            else
+            {
+                urlPath = "runs?user=" + run.Players.Data[0].Name;
+            }
+
+            return urlPath + "&game=" + run.Game.Data.Id + categoryAndLevelPath + (string.IsNullOrEmpty(variablesPath) == true ? "" : "&" + variablesPath) +
+                "&status=verified&orderby=date&direction=desc";
         }
     }
 }
