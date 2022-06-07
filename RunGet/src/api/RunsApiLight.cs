@@ -1,4 +1,6 @@
-﻿namespace RunGet
+﻿using System;
+
+namespace RunGet
 {
     public struct RunsApiLight
     {
@@ -13,7 +15,7 @@
             public string Game { get; set; }
             public string Level { get; set; }
             public string Category { get; set; }
-            public string Date { get; set; }
+            public DateTime? Date { get; set; }
             public RunsApi.Times Times { get; set; }
             public Players[] Players { get; set; }
         }
