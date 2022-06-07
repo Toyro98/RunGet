@@ -1,6 +1,6 @@
 ## 1.3.2
 ### Fixed
-  - Time difference not returning correctly if the new world record was done by same runner
+  - Time difference not returning correctly if the new world record was done by same runner (![caabffa](https://github.com/Toyro98/RunGet/commit/caabffa))
 
 ## 1.3.1
 ### Fixed
