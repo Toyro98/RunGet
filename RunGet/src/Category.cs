@@ -60,18 +60,5 @@ namespace RunGet
 
             return runs.Level.Data.Name + ": " + runs.Category.Data.Name + " - " + variables;
         }
-
-        public static string GetPlatformName(string platformName, string defaultPlatformName)
-        {
-            // TODO: Improve this, some games have the platform when displaying the variables
-            // For example "Super Mario 64 - 16 Star - N64" which N64 is the platform
-            
-            if (string.IsNullOrWhiteSpace(platformName))
-            {
-                return " (" + platformName + ")";
-            }
-
-            return (platformName == defaultPlatformName) ? "" : " (" + platformName + ")";
-        }
     }
 }
