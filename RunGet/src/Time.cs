@@ -157,7 +157,6 @@ namespace RunGet
                         }
                     }
 
-
                     if (!personalBests.Data[j].Values.SequenceEqual(run.Values))
                     {
                         continue;
