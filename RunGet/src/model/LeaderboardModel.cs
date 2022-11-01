@@ -2,34 +2,34 @@
 
 namespace RunGet
 {
-    public struct LeaderboardApi
+    public class LeaderboardModel
     {
-        public struct Root
+        public class Root
         {
             public Data Data { get; set; }
         }
 
-        public struct Data
+        public class Data
         {
             public Runs[] Runs { get; set; }
-            public RunsApi.Players Players { get; set; }
+            public RunsModel.Players Players { get; set; }
         }
 
-        public struct Runs
+        public class Runs
         {
             public int Place { get; set; }
             public Run Run { get; set; }
         }
 
-        public struct Run
+        public class Run
         {
             public string Id { get; set; }
             public string Game { get; set; }
             public DateTime? Date { get; set; }
             public string Level { get; set; }
             public string Category { get; set; }
-            public RunsApi.Times Times { get; set; }
-            public RunsApiLight.Players[] Players { get; set; }
+            public RunsModel.Times Times { get; set; }
+            public RunsModelLight.Players[] Players { get; set; }
         }
     }
 }

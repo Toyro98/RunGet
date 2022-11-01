@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace RunGet
 {
-    public class RunsApi
+    public class RunsModel
     {
         public class Root
         {
@@ -138,29 +138,11 @@ namespace RunGet
             public string Id { get; set; }
             public string Name { get; set; }
             public PlayerNames Names { get; set; }
-            public Location Location { get; set; }
         }
 
         public class PlayerNames
         {
             public string International { get; set; }
-        }
-
-        public class Location
-        {
-            public Country Country { get; set; }
-        }
-
-        public class Country
-        {
-            public string Code { get; set; }
-            public CountryNames Names { get; set; }
-        }
-
-        public class CountryNames
-        {
-            public string International { get; set; }
-            public string Japanese { get; set; }
         }
 
         public class Times
