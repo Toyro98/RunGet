@@ -4,15 +4,25 @@ namespace RunGet
 {
     public static class Title
     {
-        public static int runsFound = 0;
-        public static int requestsSent = 0;
+        public static string version;
+        public static int runsFound;
+        public static int apiRequests;
 
-        public static void Update(int runs = 0, int api = 0)
+        public static void UpdateRunsFoundCounterBy(int amount)
         {
-            runsFound += runs;
-            requestsSent += api;
+            runsFound += amount;
+            UpdateTitle();
+        }
+        
+        public static void UpdateApiCounterBy(int amount)
+        {
+            apiRequests += amount;
+            UpdateTitle();
+        }
 
-            Console.Title = $"RunGet { Utils.GetVersion() } [{runsFound} Run{((runsFound == 1) ? "" : "s")} Found, {requestsSent} Api Requests]";
+        private static void UpdateTitle()
+        {
+            Console.Title = $"RunGet {version} [{runsFound} Run{((runsFound == 1) ? "" : "s")} Found, {apiRequests} Api Requests]";
         }
     }
 }
