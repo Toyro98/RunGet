@@ -10,42 +10,33 @@ namespace RunGet
     {
         public static async Task<string> Get(string uri)
         {
-            // Client
             HttpClient client = new HttpClient
             {
                 BaseAddress = new Uri("https://www.speedrun.com/api/v1/")
             };
 
-            // Headers
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/" + Utils.GetVersion());
+            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/" + Title.version);
 
-            // Try to send a get request
             try
             {
-                // Store the data from API
                 HttpResponseMessage response = await client.GetAsync(client.BaseAddress + uri);
                 string data = await response.Content.ReadAsStringAsync();
 
-                // Update Stats
-                Title.Update(api: 1);
+                Title.UpdateApiCounterBy(1);
 
-                // Check if the status code is 200
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     return await Task.FromResult(data).ConfigureAwait(false);
                 }
-                else
-                {
-                    // Display error details. Most likely 420(Ratelimit) or 502 Badgateway
-                    Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", 
-                        DateTime.Now.ToString().Pastel("#808080"), 
-                        response.StatusCode, 
-                        response.ReasonPhrase
-                    );
+                
+                Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", 
+                    DateTime.Now.ToString().Pastel("#808080"), 
+                    response.StatusCode, 
+                    response.ReasonPhrase
+                );
 
-                    return null;
-                }
+                return null;
             }
             catch (Exception)
             {

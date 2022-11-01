@@ -4,12 +4,11 @@ namespace RunGet
 {
     public class Category
     {
-        public static string GetCategoryName(RunsApi.Data runs)
+        public static string GetCategoryName(RunsModel.Data runs)
         {
             string variables = string.Empty;
             List<string> variableNames = new List<string>();
 
-            // Get variables names if there are any
             if (runs.Values.Count > 0)
             {
                 foreach (var item in runs.Values)
@@ -26,7 +25,6 @@ namespace RunGet
                     }
                 }
 
-                // Add the variables names to the string
                 if (variableNames.Count > 0)
                 {
                     for (int i = 0; i < variableNames.Count; i++)
