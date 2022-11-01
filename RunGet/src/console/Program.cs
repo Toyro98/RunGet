@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using Pastel;
 
@@ -8,17 +10,26 @@ namespace RunGet
     {
         public static void Main(string[] args) 
         {
-            // Get the latests run id from the API
+            Version version = Assembly.GetExecutingAssembly().GetName().Version;
+            Title.version = version.Major + "." + version.Minor + (version.Build != 0 ? "." + version.Build.ToString() : "");
+
+            Runs.games = new List<Speedrun>()
+            {
+                // Mirror's Edge, Catalyst, Category Extensions, 2D, and (iOS)
+                new Speedrun() { Id = "yo1yyr1q", DefaultPlatform = "PC", WebhookUrl = ""},
+                new Speedrun() { Id = "m1mgl312", DefaultPlatform = "PC", WebhookUrl = ""},
+                new Speedrun() { Id = "76rkkvd8", DefaultPlatform = "PC", WebhookUrl = ""},
+                new Speedrun() { Id = "w6jjy56j", DefaultPlatform = "Web", WebhookUrl = ""},
+                new Speedrun() { Id = "j1lr741g", DefaultPlatform = "iOS", WebhookUrl = ""}
+            };
+
             Runs.GetLatestRunId();
             Utils.Seperator();
 
-            // Infinite loop
             while (true)
             {
-                // Sleep for 5 min
                 Thread.Sleep(TimeSpan.FromMinutes(5));
 
-                // Catch any errors and write it to the console
                 try
                 {
                     Runs.LookForNewRuns();
