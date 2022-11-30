@@ -29,7 +29,7 @@ namespace RunGet
             embed.Fields.Add(new EmbedField()
             {
                 Name = "Date Played",
-                Value = Date.FormatDate(DateTime.Parse(run.Date)),
+                Value = run.Date != null ? Date.FormatDate(DateTime.Parse(run.Date)) : "¯\\_(ツ)_/¯",
                 InLine = true
             });
 
@@ -100,10 +100,7 @@ namespace RunGet
             {
                 if (leaderboard.Data.Runs.Length > 1)
                 {
-                    var previousRecordHolder = new PreviousRecordHolder
-                    {
-                        days = Date.GetDifferenceInDays(leaderboard, personalBest)
-                    };
+                    PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDaysNew(leaderboard, personalBest);
 
                     if (Runs.IsWorldRecordAPersonalBestImprovement(leaderboard, personalBest))
                     {
@@ -114,20 +111,21 @@ namespace RunGet
                         previousRecordHolder.names = User.GetNames(Json.Deserialize<UserModel.Root>(Https.Get("runs/" + leaderboard.Data.Runs[1].Run.Id + "?embed=players").Result).Data.Players);
                     }
 
-                    if (previousRecordHolder.days > 0)
+                    if (run.Date != null)
                     {
-                        timeDifference += " (was held by " + previousRecordHolder.names + " for " + previousRecordHolder.days + " day" + (previousRecordHolder.days != 1 ? "s" : "") + ")";
-                    }
-                    else if (previousRecordHolder.days == 0)
-                    {
-                        timeDifference += " (was held by " + previousRecordHolder.names + " for less than a day)";
+                        timeDifference += " (was held by " + previousRecordHolder.names + " for " + Date.FormatDate((DateTime)previousRecordHolder.firstPlaceDate, (DateTime)previousRecordHolder.secondPlaceDate) + ")";
                     }
                     else
                     {
-                        previousRecordHolder.days *= -1;
-                        timeDifference += " (was held by " + previousRecordHolder.names + " for " + previousRecordHolder.days + " day" + (previousRecordHolder.days != 1 ? "s" : "") + ")";
+                        timeDifference += " (was held by " + previousRecordHolder.names + ", but for how long is unknown)";
                     }
                 }
+            }
+            else
+            {
+                PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDaysNew(leaderboard, personalBest);
+
+                timeDifference += " (after " + Date.FormatDate((DateTime)previousRecordHolder.firstPlaceDate, (DateTime)previousRecordHolder.secondPlaceDate) + ")";
             }
 
             embed.Fields.Add(new EmbedField()
