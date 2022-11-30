@@ -29,8 +29,7 @@ namespace RunGet
 
                 if (item.Key == "ms")
                 {
-                    finalTime = string.Format("{0:000}", item.Value);
-                    finalTime = finalTime.Remove(finalTime.Length - 1) + item.Key;
+                    finalTime = string.Format("{0:000}{1}", item.Value, item.Key);
                 }
                 else
                 {
@@ -76,16 +75,16 @@ namespace RunGet
             float previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
             float previousPersonalBest = float.MaxValue;
 
+            if (leaderboard.Data.Runs[1].Run.Date == null)
+            {
+                return FormatTime(previousWorldRecord - currentWorldRecord);
+            }
+
             for (int i = 0; i < personalBests.Data.Length; i++)
             {
                 if (personalBests.Data[i].Date == null)
                 {
                     continue;
-                }
-
-                if (leaderboard.Data.Runs[1].Run.Date == null)
-                {
-                    return string.Empty;
                 }
 
                 if (!personalBests.Data[i].Values.SequenceEqual(run.Values))
