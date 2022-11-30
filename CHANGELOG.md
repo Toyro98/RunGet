@@ -1,3 +1,12 @@
+## 0.5
+### Added
+  - [NodaTime](https://github.com/nodatime/nodatime) to get accurate date between 2 dates
+  - Every run will display how long it took for the runner to improve their run
+### Changed
+  - Added back the last digit in milliseconds
+### Fixed
+  - Return a special string if date played was null 
+
 ## 0.4
 ### Added
   - Additional rank for the non default platform
