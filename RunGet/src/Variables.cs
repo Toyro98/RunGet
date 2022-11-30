@@ -74,6 +74,8 @@ namespace RunGet
                 path = path.Remove(path.Length - 1, 1);
             }
 
+            path += "&platform=" + run.Platform.Data.Id;
+
             return path += "&status=verified&orderby=date&direction=desc";
         }
 
