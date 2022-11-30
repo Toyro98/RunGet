@@ -100,7 +100,7 @@ namespace RunGet
             {
                 if (leaderboard.Data.Runs.Length > 1)
                 {
-                    PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDaysNew(leaderboard, personalBest);
+                    PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDays(leaderboard, personalBest);
 
                     if (Runs.IsWorldRecordAPersonalBestImprovement(leaderboard, personalBest))
                     {
@@ -123,7 +123,7 @@ namespace RunGet
             }
             else
             {
-                PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDaysNew(leaderboard, personalBest);
+                PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDays(leaderboard, personalBest);
 
                 timeDifference += " (after " + Date.FormatDate((DateTime)previousRecordHolder.firstPlaceDate, (DateTime)previousRecordHolder.secondPlaceDate) + ")";
             }
