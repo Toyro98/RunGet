@@ -90,6 +90,18 @@ namespace RunGet
 
                 if (currentWorldRecordTime == personalBests.Data[i].Times.Primary_t)
                 {
+                    int index = i + 1;
+
+                    if (index > personalBests.Data.Length)
+                    {
+                        return new(personalBests.Data[index].Date, currentWorldRecordDate.Date);
+                    }
+
+                    if (previousWorldRecordTime > personalBests.Data[i + 1].Times.Primary_t)
+                    {
+                        return new(personalBests.Data[i + 1].Date, currentWorldRecordDate.Date);
+                    }
+
                     return new(previousWorldRecordDate.Date, currentWorldRecordDate.Date);
                 }
 
