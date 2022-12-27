@@ -1,3 +1,12 @@
+## 0.5.2
+### Fixed
+  - ArgumentOutOfRangeException in previous patch
+  - Not getting the correct amount of days if the runner have no previous records and the new run was a world record
+
+## 0.5.1
+### Fixed
+  - Getting days difference not returning correct amount of days 
+
 ## 0.5
 ### Added
   - [NodaTime](https://github.com/nodatime/nodatime) to get accurate date between 2 dates
