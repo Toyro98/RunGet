@@ -163,6 +163,11 @@ namespace RunGet
             float previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
             float previousPersonalBest = float.MaxValue;
 
+            if (currentWorldRecord == personalBests.Data[0].Times.Primary_t)
+            {
+                return true;
+            }
+
             for (int i = 0; i < personalBests.Data.Length; i++)
             {
                 if (personalBests.Data[i].Date == null)
