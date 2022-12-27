@@ -67,13 +67,18 @@ namespace RunGet
 
         public static PreviousRecordHolder GetDifferenceInDays(LeaderboardModel.Root leaderboard, RunsModelLight.Root personalBests)
         {
-            if (leaderboard.Data.Runs.Length < 2 && personalBests.Data.Length < 2)
+            if (leaderboard.Data.Runs.Length < 2)
             {
                 return new();
             }
 
             var currentWorldRecordDate = leaderboard.Data.Runs[0].Run.Date ?? DateTime.MaxValue;
             var previousWorldRecordDate = leaderboard.Data.Runs[1].Run.Date ?? DateTime.MaxValue;
+
+            if (personalBests.Data.Length < 2)
+            {
+                return new(previousWorldRecordDate.Date, currentWorldRecordDate.Date);
+            }
 
             var currentWorldRecordTime = leaderboard.Data.Runs[0].Run.Times.Primary_t;
             var previousWorldRecordTime = leaderboard.Data.Runs[1].Run.Times.Primary_t;
@@ -92,9 +97,9 @@ namespace RunGet
                 {
                     int index = i + 1;
 
-                    if (index > personalBests.Data.Length)
+                    if (index == personalBests.Data.Length)
                     {
-                        return new(personalBests.Data[index].Date, currentWorldRecordDate.Date);
+                        return new(personalBests.Data[index - 1].Date, currentWorldRecordDate.Date);
                     }
 
                     if (previousWorldRecordTime > personalBests.Data[i + 1].Times.Primary_t)
