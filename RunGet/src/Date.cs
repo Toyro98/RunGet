@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NodaTime;
 
 namespace RunGet
@@ -55,17 +56,17 @@ namespace RunGet
                 date = date[..^2];
             }
 
-            int a = date.LastIndexOf(",");
+            int commaIndex = date.LastIndexOf(",");
 
-            if (a != -1)
+            if (commaIndex != -1)
             {
-                date = date.Remove(a, 2).Insert(a, " and ");
+                date = date.Remove(commaIndex, 2).Insert(commaIndex, " and ");
             }
 
             return date;
         }
 
-        public static PreviousRecordHolder GetDifferenceInDays(LeaderboardModel.Root leaderboard, RunsModelLight.Root personalBests)
+        public static PreviousRecordHolder GetDifferenceInDays(LeaderboardModel.Root leaderboard, RunsModelLight.Root personalBests, RunsModel.Data run = null)
         {
             if (leaderboard.Data.Runs.Length < 2)
             {
@@ -80,52 +81,46 @@ namespace RunGet
                 return new(previousWorldRecordDate.Date, currentWorldRecordDate.Date);
             }
 
-            var currentWorldRecordTime = leaderboard.Data.Runs[0].Run.Times.Primary_t;
-            var previousWorldRecordTime = leaderboard.Data.Runs[1].Run.Times.Primary_t;
-            
-            var previousPersonalBestDate = DateTime.MaxValue;
-            var previousPersonalBestTime = float.MaxValue;
+            var personalBestsSorted = personalBests.Data.OrderBy(x => x.Times.Primary_t).ToList();
 
-            for (int i = 0; i < personalBests.Data.Length; i++)
+            for (int i = 0; i < personalBestsSorted.Count; i++)
             {
                 if (personalBests.Data[i].Date == null)
                 {
                     continue;
                 }
 
-                if (currentWorldRecordTime == personalBests.Data[i].Times.Primary_t)
+                int index = i + 1;
+
+                if (run == null)
                 {
-                    int index = i + 1;
-
-                    if (index == personalBests.Data.Length)
+                    if (leaderboard.Data.Runs[0].Run.Times.Primary_t == personalBests.Data[i].Times.Primary_t)
                     {
-                        return new(personalBests.Data[index - 1].Date, currentWorldRecordDate.Date);
-                    }
+                        if (index == personalBests.Data.Length)
+                        {
+                            return new(personalBests.Data[i].Date, currentWorldRecordDate.Date);
+                        }
 
-                    if (previousWorldRecordTime > personalBests.Data[i + 1].Times.Primary_t)
-                    {
-                        return new(personalBests.Data[i + 1].Date, currentWorldRecordDate.Date);
-                    }
+                        if (leaderboard.Data.Runs[1].Run.Times.Primary_t > personalBests.Data[index].Times.Primary_t)
+                        {
+                            return new(personalBests.Data[index].Date, currentWorldRecordDate.Date);
+                        }
 
-                    return new(previousWorldRecordDate.Date, currentWorldRecordDate.Date);
+                        return new(previousWorldRecordDate.Date, currentWorldRecordDate.Date);
+                    }
                 }
-
-                if (currentWorldRecordTime > personalBests.Data[i].Times.Primary_t)
+                else
                 {
-                    previousPersonalBestTime = personalBests.Data[i].Times.Primary_t;
-                    previousPersonalBestDate = (DateTime)personalBests.Data[i].Date;
-                    break;
+                    if (run.Times.Primary_t == personalBestsSorted[i].Times.Primary_t)
+                    {
+                        if (index == personalBestsSorted.Count)
+                        {
+                            return new(personalBestsSorted[i].Date, DateTime.Parse(run.Date));
+                        }
+
+                        return new(personalBestsSorted[index].Date, DateTime.Parse(run.Date));
+                    }
                 }
-            }
-
-            if (previousPersonalBestDate == DateTime.MaxValue)
-            {
-                return new(personalBests.Data[0].Date, personalBests.Data[1].Date);
-            }
-
-            if (previousWorldRecordDate > previousPersonalBestDate || previousWorldRecordTime > previousPersonalBestTime)
-            {
-                return new(currentWorldRecordDate.Date, previousPersonalBestDate.Date);
             }
 
             return new();

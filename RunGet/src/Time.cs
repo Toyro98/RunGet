@@ -6,56 +6,83 @@ namespace RunGet
 {
     public class Time
     {
-        public static string FormatTime(float time)
-        {
-            var roundedTime = new TimeSpan((long)Math.Round(1.0f * TimeSpan.FromSeconds(time).Ticks / 10000) * 10000);
+        public const decimal MinTime = 0m;
+        public const decimal MaxTime = 35999999.999m;
 
-            var timeDict = new Dictionary<string, int>
+        public const string Milliseconds = "ms";
+        public const string Seconds = "s";
+        public const string Minutes = "m";
+        public const string Hours = "h";
+
+        public static string FormatTime(decimal totalTime)
+        {
+            if (totalTime > MaxTime || totalTime <= MinTime)
             {
-                { "ms", roundedTime.Milliseconds },
-                { "s", roundedTime.Seconds },
-                { "m", roundedTime.Minutes },
-                { "h", roundedTime.Hours },
-                { "d", roundedTime.Days }
+                return "";
+            }
+
+            Dictionary<string, int> timeDictionary = new Dictionary<string, int>
+            {
+                { Milliseconds, (int)((totalTime - (int)totalTime) * 1000) },
+                { Seconds, (int)totalTime % 60 },
+                { Minutes, (int)(totalTime / 60 % 60) },
+                { Hours, (int)(totalTime / 60 / 60) }
             };
 
-            var finalTime = string.Empty;
-            foreach (var item in timeDict)
+            string time = string.Empty;
+            foreach (var item in timeDictionary)
             {
                 if (item.Value == 0)
                 {
                     continue;
                 }
 
-                if (item.Key == "ms")
+                if (item.Key == Milliseconds)
                 {
-                    finalTime = string.Format("{0:000}{1}", item.Value, item.Key);
+                    time = item.Value.ToString("000") + item.Key;
                 }
                 else
                 {
-                    finalTime = finalTime.Insert(0, item.Value + item.Key + (finalTime.Length > 0 ? " " : ""));
+                    time = time.Insert(0, item.Value + item.Key + " ");
                 }
             }
 
-            return finalTime;
+            return time.TrimEnd();
         }
 
         public static string GetTimeDifference(RunsModelLight.Root personalBests, RunsModel.Data run)
         {
             if (personalBests.Data.Length >= 2)
             {
-                float timeDiff;
+                decimal timeDiff = 0m;
 
                 if (run.Players.Data.Length == 1)
                 {
-                    timeDiff = personalBests.Data[1].Times.Primary_t - personalBests.Data[0].Times.Primary_t;
+                    var personalBestsSorted = personalBests.Data.OrderBy(x => x.Times.Primary_t).ToList();
+
+                    for (int i = 0; i < personalBestsSorted.Count; i++)
+                    {
+                        if (run.Times.Primary_t == personalBestsSorted[i].Times.Primary_t)
+                        {
+                            if (i + 1 == personalBestsSorted.Count)
+                            {
+                                timeDiff = personalBestsSorted[i].Times.Primary_t - run.Times.Primary_t;
+                            }
+                            else
+                            {
+                                timeDiff = personalBestsSorted[i + 1].Times.Primary_t - run.Times.Primary_t;
+                            }
+
+                            break;
+                        }
+                    }
                 }
                 else
                 {
                     timeDiff = GetTimeDifferenceFromMultipleRunners(personalBests, run);
                 }
 
-                if (timeDiff > 0f)
+                if (timeDiff > 0m)
                 {
                     return FormatTime(timeDiff);
                 }
@@ -66,14 +93,14 @@ namespace RunGet
 
         public static string GetTimeDifferenceWorldRecord(LeaderboardModel.Root leaderboard, RunsModelLight.Root personalBests, RunsModel.Data run)
         {
-            if (leaderboard.Data.Runs.Length < 2 && personalBests.Data.Length < 2)
+            if (leaderboard.Data.Runs.Length < 2)
             {
                 return string.Empty;
             }
 
-            float currentWorldRecord = leaderboard.Data.Runs[0].Run.Times.Primary_t;
-            float previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
-            float previousPersonalBest = float.MaxValue;
+            decimal currentWorldRecord = leaderboard.Data.Runs[0].Run.Times.Primary_t;
+            decimal previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
+            decimal previousPersonalBest = decimal.MaxValue;
 
             if (leaderboard.Data.Runs[1].Run.Date == null)
             {
@@ -102,12 +129,12 @@ namespace RunGet
                 }
             }
 
-            if (previousPersonalBest != float.MaxValue || previousWorldRecord > previousPersonalBest)
+            if (previousPersonalBest != decimal.MaxValue || previousWorldRecord > previousPersonalBest)
             {
                 return FormatTime(previousPersonalBest - currentWorldRecord);
             }
 
-            if (previousWorldRecord - currentWorldRecord != 0f)
+            if (previousWorldRecord - currentWorldRecord != 0m)
             {
                 return FormatTime(previousWorldRecord - currentWorldRecord);
             }
@@ -115,10 +142,10 @@ namespace RunGet
             return string.Empty;
         }
 
-        private static float GetTimeDifferenceFromMultipleRunners(RunsModelLight.Root personalBests, RunsModel.Data run)
+        private static decimal GetTimeDifferenceFromMultipleRunners(RunsModelLight.Root personalBests, RunsModel.Data run)
         {
-            float currentPersonalBest = 0f;
-            float oldPersonalBest = 0f;
+            decimal currentPersonalBest = 0m;
+            decimal oldPersonalBest = 0m;
 
             for (int i = 0; i < personalBests.Data.Length; i++)
             {
@@ -149,7 +176,7 @@ namespace RunGet
                         continue;
                     }
 
-                    if (currentPersonalBest == 0f)
+                    if (currentPersonalBest == 0m)
                     {
                         currentPersonalBest = personalBests.Data[i].Times.Primary_t;
                     }
@@ -158,14 +185,14 @@ namespace RunGet
                         oldPersonalBest = personalBests.Data[i].Times.Primary_t;
                     }
 
-                    if (currentPersonalBest != oldPersonalBest && currentPersonalBest != 0f && oldPersonalBest != 0f)
+                    if (currentPersonalBest != oldPersonalBest && currentPersonalBest != 0m && oldPersonalBest != 0m)
                     {
                         return oldPersonalBest - currentPersonalBest;
                     }
                 }
             }
 
-            return -1f;
+            return -1m;
         }
     }
 }

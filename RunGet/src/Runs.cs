@@ -91,7 +91,7 @@ namespace RunGet
                                 leaderboard = leaderboard,
                                 personalBest = personalBests,
                                 defaultPlatform = games[i].DefaultPlatform,
-                                rank = Rank.GetLeaderboardRank(leaderboard, run.Players)
+                                rank = Rank.GetLeaderboardRank(leaderboard, run)
                             };
 
                             if (webhook.rank == 1)
@@ -106,7 +106,7 @@ namespace RunGet
                             if (run.Platform.Data.Name != webhook.defaultPlatform)
                             {
                                 leaderboard = Json.Deserialize<LeaderboardModel.Root>(Https.Get(Variables.GetLeaderboardPath(run, true)).Result);
-                                webhook.consoleRank = Rank.GetLeaderboardRank(leaderboard, run.Players);
+                                webhook.consoleRank = Rank.GetLeaderboardRank(leaderboard, run);
                             }
 
                             DiscordMessage message = webhook.CreateEmbedMessage();
@@ -141,6 +141,9 @@ namespace RunGet
 
                 if (data == null || data.Length == 0)
                 {
+                    Console.WriteLine("[{0}] Failed to get data (data == null || data.Length == 0). Trying again in 5 min.",
+                    DateTime.Now.ToString().Pastel("#808080"));
+
                     data = Array.Empty<RunsModel.Data>();
                     Thread.Sleep(TimeSpan.FromMinutes(5));
                 }
@@ -151,7 +154,7 @@ namespace RunGet
 
         public static bool IsWorldRecordAPersonalBestImprovement(LeaderboardModel.Root leaderboard, RunsModelLight.Root personalBests)
         {
-            if (leaderboard.Data.Runs.Length < 2 && personalBests.Data.Length < 2)
+            if (personalBests.Data.Length == 1)
             {
                 return false;
             }
@@ -159,14 +162,9 @@ namespace RunGet
             var previousWorldRecordDate = leaderboard.Data.Runs[1].Run.Date ?? DateTime.MaxValue;
             var previousPersonalBestDate = DateTime.MaxValue;
 
-            float currentWorldRecord = leaderboard.Data.Runs[0].Run.Times.Primary_t;
-            float previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
-            float previousPersonalBest = float.MaxValue;
-
-            if (currentWorldRecord == personalBests.Data[0].Times.Primary_t)
-            {
-                return true;
-            }
+            decimal currentWorldRecord = leaderboard.Data.Runs[0].Run.Times.Primary_t;
+            decimal previousWorldRecord = leaderboard.Data.Runs[1].Run.Times.Primary_t;
+            decimal previousPersonalBest = decimal.MaxValue;
 
             for (int i = 0; i < personalBests.Data.Length; i++)
             {

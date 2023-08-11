@@ -40,8 +40,6 @@ namespace RunGet
         {
             public string Id { get; set; }
             public GameNames Names { get; set; }
-            public string Abbreviation { get; set; }
-            public string Weblink { get; set; }
             public GameAssets Assets { get; set; }
         }
 
@@ -70,9 +68,6 @@ namespace RunGet
 
         public class CategoryVariablesData
         {
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string Category { get; set; }
             public CategoryVariablesValues Values { get; set; }
 
             [JsonProperty("is-subcategory")]
@@ -82,7 +77,6 @@ namespace RunGet
         public class CategoryVariablesValues
         {
             public Dictionary<string, CategoryValueData> Values { get; set; }
-            public string Default { get; set; }
         }
 
         public class CategoryValueData
@@ -99,7 +93,6 @@ namespace RunGet
         {
             public string Id { get; set; }
             public string Name { get; set; }
-            public string Weblink { get; set; }
             public LevelVariables Variables { get; set; }
         }
 
@@ -110,16 +103,12 @@ namespace RunGet
 
         public class LevelVariablesData
         {
-            public string Id { get; set; }
-            public string Name { get; set; }
-            public string Level { get; set; }
             public LevelVariablesValues Values { get; set; }
         }
 
         public class LevelVariablesValues
         {
             public Dictionary<string, LevelValueData> Values { get; set; }
-            public string Default { get; set; }
         }
 
         public class LevelValueData
@@ -147,10 +136,7 @@ namespace RunGet
 
         public class Times
         {
-            public float Primary_t { get; set; }
-            public float Realtime_t { get; set; }
-            public float Realtime_noloads_t { get; set; }
-            public float Ingame_t { get; set; }
+            public decimal Primary_t { get; set; }
         }
 
         public class Platform

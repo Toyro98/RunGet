@@ -12,10 +12,6 @@ namespace RunGet
 
         public class Data
         {
-            public string Id { get; set; }
-            public string Game { get; set; }
-            public string Level { get; set; }
-            public string Category { get; set; }
             public DateTime? Date { get; set; }
             public RunsModel.Times Times { get; set; }
             public Players[] Players { get; set; }
@@ -24,7 +20,6 @@ namespace RunGet
 
         public class Players
         {
-            public string Rel { get; set; }
             public string Id { get; set; }
             public string Name { get; set; }
         }

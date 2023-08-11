@@ -11,7 +11,7 @@ namespace RunGet
         public static void Main(string[] args) 
         {
             Version version = Assembly.GetExecutingAssembly().GetName().Version;
-            Title.version = version.Major + "." + version.Minor + (version.Build != 0 ? "." + version.Build.ToString() : "");
+            Title.Version = version.Major + "." + version.Minor + (version.Build != 0 ? "." + version.Build.ToString() : "");
 
             Runs.games = new List<Speedrun>()
             {

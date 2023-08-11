@@ -1,3 +1,5 @@
+using System;
+
 namespace RunGet
 {
     public static class Variables
@@ -81,7 +83,7 @@ namespace RunGet
 
         public static string GetLeaderboardPath(RunsModel.Data run, bool isConsole)
         {
-            var path = "leaderboards/" + run.Game.Data.Id;
+            string path = "leaderboards/" + run.Game.Data.Id;
 
             if (run.Level != null)
             {
@@ -101,7 +103,18 @@ namespace RunGet
 
             if (run.Values.Count > 0)
             {
-                path += isConsole ? "&" : "?" + GetValuesPath(run);
+                path += (isConsole ? "&" : "?") + GetValuesPath(run);
+            }
+
+            path += path.Contains('?') ? "&" : "?";
+
+            if (run.Date != null)
+            {
+                path += "date=" + DateTime.Parse(run.Date).AddDays(1).ToString("yyyy-MM-dd");
+            }
+            else
+            {
+                path += "date=" + run.Submitted.AddDays(1).ToString("yyyy-MM-dd");
             }
 
             return path;

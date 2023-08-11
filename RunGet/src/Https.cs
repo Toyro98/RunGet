@@ -16,7 +16,7 @@ namespace RunGet
             };
 
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/" + Title.version);
+            client.DefaultRequestHeaders.Add("User-Agent", "RunGet/" + Title.Version);
 
             try
             {
@@ -32,7 +32,7 @@ namespace RunGet
                 
                 Console.WriteLine("[{0}] Status Code: {1} ({2}) Trying again in 5 min.", 
                     DateTime.Now.ToString().Pastel("#808080"), 
-                    response.StatusCode, 
+                    (int)response.StatusCode, 
                     response.ReasonPhrase
                 );
 

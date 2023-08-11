@@ -4,27 +4,34 @@ namespace RunGet
 {
     public class Rank
     {
-        public static int GetLeaderboardRank(LeaderboardModel.Root leaderboard, RunsModel.Players run)
+        public static int GetLeaderboardRank(LeaderboardModel.Root leaderboard, RunsModel.Data run)
         {
             for (int i = 0; i < leaderboard.Data.Runs.Length; i++)
             {
-                if (run.Data[0].Rel == "user")
+                if (leaderboard.Data.Runs[i].Run.Times.Primary_t >= run.Times.Primary_t)
                 {
-                    if (leaderboard.Data.Runs[i].Run.Players[0].Id == run.Data[0].Id)
+                    for (int j = i; j < leaderboard.Data.Runs.Length; j++)
                     {
-                        return leaderboard.Data.Runs[i].Place;
+                        if (leaderboard.Data.Runs[j].Place == 0)
+                        {
+                            if (leaderboard.Data.Runs.Length == j + 1)
+                            {
+                                return leaderboard.Data.Runs[j].Place;
+                            }
+
+                            return leaderboard.Data.Runs[j + 1].Place;
+                        }
+                        else
+                        { 
+                            return leaderboard.Data.Runs[j].Place;
+                        }
                     }
 
-                    continue;
-                }
-
-                if (leaderboard.Data.Runs[i].Run.Players[0].Name == run.Data[0].Name)
-                {
                     return leaderboard.Data.Runs[i].Place;
                 }
             }
 
-            throw new Exception();
+            return -1;
         }
     }
 }

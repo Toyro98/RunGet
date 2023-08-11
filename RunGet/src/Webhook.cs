@@ -82,7 +82,7 @@ namespace RunGet
 
                 Thumbnail = new EmbedMedia()
                 {
-                    Url = run.Game.Data.Assets.Coversmall.Uri
+                    Url = run.Game.Data.Assets.Coversmall.Uri.Replace("gameasset", "static/game")
                 },
 
                 Author = new EmbedAuthor()
@@ -123,7 +123,7 @@ namespace RunGet
             }
             else
             {
-                PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDays(leaderboard, personalBest);
+                PreviousRecordHolder previousRecordHolder = Date.GetDifferenceInDays(leaderboard, personalBest, run);
 
                 timeDifference += " (after " + Date.FormatDate((DateTime)previousRecordHolder.firstPlaceDate, (DateTime)previousRecordHolder.secondPlaceDate) + ")";
             }

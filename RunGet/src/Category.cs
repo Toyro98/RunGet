@@ -9,54 +9,44 @@ namespace RunGet
             string variables = string.Empty;
             List<string> variableNames = new List<string>();
 
-            if (runs.Values.Count > 0)
+            if (runs.Values.Count == 0)
             {
-                foreach (var item in runs.Values)
-                {
-                    foreach (var category in runs.Category.Data.Variables.Data)
-                    {
-                        foreach (var categoryData in category.Values.Values)
-                        {
-                            if (item.Value == categoryData.Key && category.IsSubCategory)
-                            {
-                                variableNames.Add(categoryData.Value.Label);
-                            }
-                        }
-                    }
-                }
+                return NewMethod(runs, variables);
+            }
 
-                if (variableNames.Count > 0)
+            foreach (var item in runs.Values)
+            {
+                foreach (var category in runs.Category.Data.Variables.Data)
                 {
-                    for (int i = 0; i < variableNames.Count; i++)
+                    foreach (var categoryData in category.Values.Values)
                     {
-                        if (i == 0)
+                        if (item.Value == categoryData.Key && category.IsSubCategory)
                         {
-                            variables += variableNames[i];
-                        }
-                        else
-                        {
-                            variables += ", " + variableNames[i];
+                            variableNames.Add(categoryData.Value.Label);
                         }
                     }
                 }
             }
 
-            if (runs.Category.Data.Type == "per-game")
+            if (variableNames.Count > 0)
             {
-                if (string.IsNullOrEmpty(variables))
+                for (int i = 0; i < variableNames.Count; i++)
                 {
-                    return runs.Category.Data.Name;
+                    variables += (i == 0 ? "" : ", ") + variableNames[i];
+                }
+            }
+
+            return NewMethod(runs, variables);
+
+            static string NewMethod(RunsModel.Data runs, string variables)
+            {
+                if (runs.Category.Data.Type == "per-game")
+                {
+                    return runs.Category.Data.Name + (string.IsNullOrEmpty(variables) ? "" : " - " + variables);
                 }
 
-                return runs.Category.Data.Name + " - " + variables;
+                return runs.Level.Data.Name + ": " + runs.Category.Data.Name + (string.IsNullOrEmpty(variables) ? "" : " - " + variables);
             }
-
-            if (string.IsNullOrEmpty(variables))
-            {
-                return runs.Level.Data.Name + ": " + runs.Category.Data.Name;
-            }
-
-            return runs.Level.Data.Name + ": " + runs.Category.Data.Name + " - " + variables;
         }
     }
 }
