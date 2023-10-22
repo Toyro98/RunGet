@@ -75,11 +75,6 @@ namespace RunGet
                                 }
                             }
 
-                            DiscordWebhook url = new DiscordWebhook() 
-                            { 
-                                Url = games[i].WebhookUrl 
-                            };
-
                             RunsModel.Data run = games[i].Runs[runsFound];
 
                             var leaderboard = Json.Deserialize<LeaderboardModel.Root>(Https.Get(Variables.GetLeaderboardPath(run, false)).Result);
@@ -110,7 +105,17 @@ namespace RunGet
                             }
 
                             DiscordMessage message = webhook.CreateEmbedMessage();
-                            Webhook.Send(url, message);
+
+                            for (int k = 0; k < games[i].WebhookUrls.Count; k++)
+                            {
+                                DiscordWebhook url = new DiscordWebhook()
+                                {
+                                    Url = games[i].WebhookUrls[k]
+                                };
+
+                                Webhook.Send(url, message);
+                                Thread.Sleep(250);
+                            }
 
                             Console.WriteLine("[{0}] Run ID: {1}",
                                 DateTime.Now.ToString().Pastel("#808080"),

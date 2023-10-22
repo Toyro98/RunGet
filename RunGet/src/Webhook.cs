@@ -45,10 +45,7 @@ namespace RunGet
                 Embeds = new List<DiscordEmbed>()
                 {
                     embed
-                },
-
-                Username = "Verified Runs",
-                AvatarUrl = "https://raw.githubusercontent.com/Toyro98/RunGet/main/RunGet/src/image/Avatar.png"
+                }
             };
         }
 
