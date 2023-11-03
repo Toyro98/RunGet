@@ -196,7 +196,7 @@ namespace RunGet
 
             if (previousWorldRecord > previousPersonalBest)
             {
-                if (previousPersonalBestDate > previousWorldRecordDate)
+                if (previousPersonalBestDate < previousWorldRecordDate)
                 {
                     return true;
                 }
